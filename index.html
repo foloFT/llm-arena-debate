@@ -108,56 +108,42 @@
                     <p id="currentQuestion" class="text-blue-800"></p>
                 </div>
 
-                <!-- AI Specialists Status -->
-                <div class="grid md:grid-cols-4 gap-4 mb-6">
-                    <div class="bg-white p-4 rounded-lg shadow border-l-4 border-blue-500">
-                        <div class="flex items-center mb-2">
-                            <div class="w-3 h-3 bg-blue-500 rounded-full mr-2"></div>
-                            <span class="font-medium">GPT-4.1</span>
-                        </div>
-                        <div class="text-xs text-gray-500 mb-1">Implementation Specialist</div>
-                        <div id="status1" class="text-xs text-gray-400">Ready</div>
-                    </div>
-                    <div class="bg-white p-4 rounded-lg shadow border-l-4 border-purple-500">
-                        <div class="flex items-center mb-2">
-                            <div class="w-3 h-3 bg-purple-500 rounded-full mr-2"></div>
-                            <span class="font-medium">Claude-4</span>
-                        </div>
-                        <div class="text-xs text-gray-500 mb-1">Systems Thinker</div>
-                        <div id="status2" class="text-xs text-gray-400">Ready</div>
-                    </div>
-                    <div class="bg-white p-4 rounded-lg shadow border-l-4 border-green-500">
-                        <div class="flex items-center mb-2">
-                            <div class="w-3 h-3 bg-green-500 rounded-full mr-2"></div>
-                            <span class="font-medium">Gemini-2.5</span>
-                        </div>
-                        <div class="text-xs text-gray-500 mb-1">Creative Solutions</div>
-                        <div id="status3" class="text-xs text-gray-400">Ready</div>
-                    </div>
-                    <div class="bg-white p-4 rounded-lg shadow">
-                        <div class="text-sm font-medium mb-1">Round</div>
-                        <div id="roundCounter" class="text-2xl font-bold text-gray-600">1</div>
-                        <div class="text-xs text-gray-400" id="convergenceStatus">Exploring...</div>
-                        <div class="mt-2">
-                            <div class="text-xs text-gray-500">Convergence:</div>
-                            <div class="w-full bg-gray-200 rounded-full h-1 mt-1">
-                                <div id="convergenceBar" class="bg-green-500 h-1 rounded-full transition-all duration-500" style="width: 10%"></div>
+                    <div class="grid md:grid-cols-3 gap-4 mb-6">
+                        <div class="bg-white p-4 rounded-lg shadow border-l-4 border-blue-500">
+                            <div class="flex items-center mb-2">
+                                <div class="w-3 h-3 bg-blue-500 rounded-full mr-2"></div>
+                                <span class="font-medium">GPT-4.1</span>
                             </div>
+                            <div class="text-xs text-gray-500 mb-1">Implementation Specialist</div>
+                            <div id="status1" class="text-xs text-gray-400">Ready</div>
+                        </div>
+                        <div class="bg-white p-4 rounded-lg shadow border-l-4 border-purple-500">
+                            <div class="flex items-center mb-2">
+                                <div class="w-3 h-3 bg-purple-500 rounded-full mr-2"></div>
+                                <span class="font-medium">Claude-4</span>
+                            </div>
+                            <div class="text-xs text-gray-500 mb-1">Systems Thinker</div>
+                            <div id="status2" class="text-xs text-gray-400">Ready</div>
+                        </div>
+                        <div class="bg-white p-4 rounded-lg shadow border-l-4 border-green-500">
+                            <div class="flex items-center mb-2">
+                                <div class="w-3 h-3 bg-green-500 rounded-full mr-2"></div>
+                                <span class="font-medium">Gemini-2.5</span>
+                            </div>
+                            <div class="text-xs text-gray-500 mb-1">Creative Solutions</div>
+                            <div id="status3" class="text-xs text-gray-400">Ready</div>
                         </div>
                     </div>
-                </div>
 
                 <!-- Collaboration Flow -->
                 <div id="collaborationFlow" class="collaboration-flow space-y-6 mb-6"></div>
 
-                <!-- Controls -->
+                <!-- Auto Status -->
                 <div class="bg-white p-4 rounded-lg shadow text-center">
-                    <button id="continueBtn" onclick="continueCollaboration()" style="display: none;" class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 mr-4">
-                        Continue Collaboration
-                    </button>
-                    <button id="finalizeBtn" onclick="finalizeSolution()" style="display: none;" class="bg-green-600 text-white px-6 py-2 rounded-lg hover:bg-green-700">
-                        Finalize Solution
-                    </button>
+                    <div id="autoStatus" class="text-gray-600">
+                        <span class="inline-block w-2 h-2 bg-blue-500 rounded-full mr-2 animate-pulse"></span>
+                        AIs are collaborating autonomously...
+                    </div>
                 </div>
             </div>
 
@@ -187,25 +173,37 @@ var convergenceScore = 0;
 
 console.log('✅ Global variables initialized');
 
-// Demo collaboration with realistic think tank behavior
+// Demo collaboration with more rounds and natural evolution
 var demoCollaboration = [
-    // Round 1: Initial perspectives on the specific question
+    // Round 1: Initial perspectives
     {
         gpt4: "Looking at this practically, I see three immediate implementation paths we could pursue. First, we need to establish clear metrics to measure success. Second, we should consider a phased rollout approach to minimize risk. Third, we need stakeholder buy-in from the start. What concerns me most is ensuring we have adequate resources for execution.",
         claude: "I want to zoom out and consider the broader systemic implications. This problem sits within a larger ecosystem of interconnected factors. We need to understand the root causes, not just treat symptoms. I'm particularly thinking about unintended consequences and how this solution might affect different stakeholder groups over time.",
         gemini: "What if we approached this from a completely different angle? Instead of the traditional solutions, I'm seeing some innovative possibilities. We could leverage emerging technologies, create novel partnerships, or even reframe the problem entirely. Sometimes the best solutions come from questioning our assumptions about what's possible."
     },
-    // Round 2: Building on each other's ideas
+    // Round 2: Building on each other
     {
         gpt4: "Claude's point about systemic thinking is crucial - I was too focused on immediate implementation. If we combine that systems perspective with my phased approach, we could design pilot programs that test not just effectiveness but also those broader implications Claude mentioned. Gemini, your idea about reframing got me thinking - what if we're solving the wrong problem?",
         claude: "Exactly, GPT! And Gemini's suggestion about questioning assumptions is making me reconsider the stakeholder analysis. What if the people we think are affected aren't the only ones, or aren't affected in the ways we assume? GPT's pilot program idea could help us discover these hidden stakeholder effects before full implementation.",
         gemini: "Building on both your insights - what if we create an adaptive solution that evolves? GPT's phased implementation + Claude's systems monitoring + my reframing approach. We could design something that learns and adjusts based on real feedback. The solution becomes a living system rather than a fixed answer."
     },
-    // Round 3: Synthesis and new ideas emerging
+    // Round 3: New ideas emerging
     {
         gpt4: "This conversation is leading me to a new realization - we need a 'learning implementation' framework. Start small with Claude's systemic monitoring, use Gemini's adaptive principles, but build in rapid iteration cycles. Actually, what if failure becomes a feature, not a bug? Design for safe failure and fast learning.",
         claude: "That's brilliant, GPT! A 'safe-to-fail' design philosophy addresses my concerns about unintended consequences. And it builds on Gemini's adaptive concept. But I want to add: we need 'stakeholder feedback loops' built into every iteration. Not just measuring outcomes, but continuously asking affected people what we're missing.",
         gemini: "You've both expanded my thinking! What emerged for me is this: instead of solving THE problem, we create a collaborative problem-solving system. The stakeholders become co-creators, not just recipients. This addresses GPT's implementation needs, Claude's systemic concerns, and creates something more innovative than any of us initially imagined."
+    },
+    // Round 4: Deeper synthesis
+    {
+        gpt4: "Now I'm seeing how all our ideas connect into something powerful. The collaborative problem-solving system Gemini described could use my implementation framework as its backbone, with Claude's stakeholder feedback loops as the nervous system. We're not just solving a problem - we're building capacity for ongoing problem-solving.",
+        claude: "This integration is getting exciting! What if we add ethical checkpoints at each iteration? Not as barriers, but as enhancement points where we ask: 'How does this serve human flourishing?' GPT's learning cycles + Gemini's co-creation + ethical enhancement at every step. We're designing for both effectiveness and wisdom.",
+        gemini: "I'm having a breakthrough moment here. What we've collectively designed is a 'wisdom-generating system' - it doesn't just solve problems, it makes everyone involved smarter and more capable. The solution teaches people how to solve similar problems themselves. That's transformational, not just transactional."
+    },
+    // Round 5: Final convergence
+    {
+        gpt4: "We've created something remarkable together. A system that implements wisely, learns continuously, and builds collective capacity. The practical steps are clear: start with stakeholder mapping, design safe-to-fail experiments, build in feedback loops, and scale what works. But more importantly, we've designed for long-term capability building.",
+        claude: "I feel we've reached a beautiful synthesis. The solution honors both pragmatic needs and deeper values. It's implementable but not rigid, systematic but not mechanical, innovative but not reckless. What gives me confidence is that this approach can handle uncertainty because it's designed to learn and adapt ethically.",
+        gemini: "This collaboration has been generative in the best sense. We started with individual perspectives and created something none of us could have imagined alone. The solution we've designed embodies the same collaborative principles we used to create it. That feels like the right answer - not just what to do, but how to be."
     }
 ];
 
@@ -264,16 +262,14 @@ function startCollaboration() {
     currentRound = 1;
     collaborationHistory = [];
     isCollaborating = true;
-    convergenceScore = 10;
-    updateConvergenceDisplay();
     
+    // Start automatic collaboration
     generateRound();
 }
 
 async function generateRound() {
     if (!isCollaborating) return;
     
-    document.getElementById('roundCounter').textContent = currentRound;
     document.getElementById('status1').textContent = 'Thinking...';
     document.getElementById('status2').textContent = 'Thinking...';
     document.getElementById('status3').textContent = 'Thinking...';
@@ -316,19 +312,19 @@ async function generateRound() {
             document.getElementById('status3').textContent = 'Complete';
         }
         
-        // Update convergence
-        convergenceScore += 20;
-        updateConvergenceDisplay();
-        
-        // Check if we should continue or finish
-        if (currentRound >= 3 || convergenceScore >= 80) {
-            document.getElementById('finalizeBtn').style.display = 'inline-block';
-            if (currentRound < 5) {
-                document.getElementById('continueBtn').style.display = 'inline-block';
-            }
-        } else {
+        // Check if we should continue automatically
+        if (currentRound < demoCollaboration.length) {
             currentRound++;
-            document.getElementById('continueBtn').style.display = 'inline-block';
+            // Automatically continue to next round after a brief pause
+            setTimeout(function() {
+                generateRound();
+            }, 2000);
+        } else {
+            // Natural conclusion reached
+            setTimeout(function() {
+                document.getElementById('autoStatus').innerHTML = '<span class="text-green-600"><strong>✅ Collaboration complete!</strong> The AIs have reached a comprehensive solution.</span>';
+                setTimeout(finalizeSolution, 2000);
+            }, 1000);
         }
         
     } catch (error) {
@@ -381,25 +377,7 @@ function displayRound(responses) {
     roundDiv.scrollIntoView({ behavior: 'smooth' });
 }
 
-function updateConvergenceDisplay() {
-    var percentage = Math.min(convergenceScore, 100);
-    document.getElementById('convergenceBar').style.width = percentage + '%';
-    
-    var status = 'Exploring...';
-    if (percentage >= 80) status = 'Converging!';
-    else if (percentage >= 60) status = 'Building ideas...';
-    else if (percentage >= 40) status = 'Collaborating...';
-    
-    document.getElementById('convergenceStatus').textContent = status;
-}
-
-function continueCollaboration() {
-    currentRound++;
-    document.getElementById('continueBtn').style.display = 'none';
-    document.getElementById('finalizeBtn').style.display = 'none';
-    generateRound();
-}
-
+// Remove unused functions
 function finalizeSolution() {
     isCollaborating = false;
     document.getElementById('collaborationArena').style.display = 'none';
