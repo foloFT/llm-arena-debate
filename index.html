@@ -1,0 +1,683 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LLM Arena Debate</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
+    <style>
+        body { 
+            font-family: system-ui, sans-serif; 
+        }
+        .gradient-bg { 
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
+        }
+        .thinking { 
+            animation: pulse 2s infinite; 
+        }
+        @keyframes pulse { 
+            0%, 100% { opacity: 1; } 
+            50% { opacity: 0.5; } 
+        }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+
+    <div class="gradient-bg text-white p-6 shadow-lg">
+        <div class="max-w-6xl mx-auto">
+            <h1 class="text-3xl font-bold mb-2">🤖 LLM Arena Debate</h1>
+            <p class="text-blue-100">GPT-4 vs Claude vs Gemini - Real AI Debate with Consensus</p>
+        </div>
+    </div>
+
+    <div class="max-w-6xl mx-auto p-6">
+        
+        <!-- API Keys Setup -->
+        <div id="apiSetup" class="bg-white rounded-lg shadow-lg p-6 mb-6">
+            <h2 class="text-2xl font-bold mb-4">🔑 Step 1: Add Your API Keys</h2>
+            <div class="grid md:grid-cols-3 gap-4 mb-4">
+                <div>
+                    <label class="block text-sm font-medium mb-2">OpenAI API Key</label>
+                    <input type="password" id="openaiKey" placeholder="sk-..." class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500">
+                    <small class="text-gray-500">Get from: platform.openai.com</small>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium mb-2">Anthropic API Key</label>
+                    <input type="password" id="anthropicKey" placeholder="sk-ant..." class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500">
+                    <small class="text-gray-500">Get from: console.anthropic.com</small>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium mb-2">Google AI API Key</label>
+                    <input type="password" id="geminiKey" placeholder="AIza..." class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500">
+                    <small class="text-gray-500">Get from: ai.google.dev</small>
+                </div>
+            </div>
+            <button onclick="saveKeys()" class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 mr-4">
+                Save Keys & Continue
+            </button>
+            <button onclick="useDemoMode()" class="bg-yellow-600 text-white px-6 py-2 rounded-lg hover:bg-yellow-700">
+                Use Demo Mode
+            </button>
+            <div class="mt-4 p-4 bg-blue-50 border-l-4 border-blue-400">
+                <p class="text-sm"><strong>New:</strong> Now includes Google Gemini! You can use any combination of the three APIs.</p>
+            </div>
+        </div>
+
+        <!-- Main App -->
+        <div id="mainApp" style="display: none;">
+            
+            <!-- Topic Setup -->
+            <div id="topicSetup" class="bg-white rounded-lg shadow-lg p-6 mb-6">
+                <h2 class="text-2xl font-bold mb-4">💭 Step 2: Choose Your Debate Topic</h2>
+                <input type="text" id="topicInput" placeholder="Enter a debate topic..." class="w-full p-3 border rounded-lg mb-4">
+                
+                <div class="mb-4">
+                    <h3 class="font-medium mb-2">Quick Start Topics:</h3>
+                    <div class="space-y-2">
+                        <button onclick="setTopic('Should AI systems be granted legal personhood?')" class="w-full text-left p-3 bg-gray-50 hover:bg-gray-100 rounded">
+                            Should AI systems be granted legal personhood?
+                        </button>
+                        <button onclick="setTopic('Is remote work better for productivity than office work?')" class="w-full text-left p-3 bg-gray-50 hover:bg-gray-100 rounded">
+                            Is remote work better for productivity than office work?
+                        </button>
+                        <button onclick="setTopic('Should social media platforms be regulated as public utilities?')" class="w-full text-left p-3 bg-gray-50 hover:bg-gray-100 rounded">
+                            Should social media platforms be regulated as public utilities?
+                        </button>
+                        <button onclick="setTopic('Will AI make universal basic income necessary?')" class="w-full text-left p-3 bg-gray-50 hover:bg-gray-100 rounded">
+                            Will AI make universal basic income necessary?
+                        </button>
+                    </div>
+                </div>
+                
+                <button onclick="startDebate()" class="bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700">
+                    🚀 Start 3-Way AI Debate
+                </button>
+            </div>
+
+            <!-- Debate Arena -->
+            <div id="debateArena" style="display: none;">
+                
+                <!-- Current Topic -->
+                <div class="bg-blue-50 border-l-4 border-blue-500 p-4 rounded mb-6">
+                    <h3 class="font-bold text-blue-900">Current Debate Topic:</h3>
+                    <p id="currentTopic" class="text-blue-800"></p>
+                </div>
+
+                <!-- Progress -->
+                <div class="bg-white rounded-lg p-4 shadow mb-6">
+                    <div class="flex justify-between mb-2">
+                        <span class="font-medium">Progress</span>
+                        <span id="progressText">Round 1 of 3</span>
+                    </div>
+                    <div class="w-full bg-gray-200 rounded-full h-2">
+                        <div id="progressBar" class="bg-blue-600 h-2 rounded-full transition-all duration-500" style="width: 33%"></div>
+                    </div>
+                </div>
+
+                <!-- Models Status -->
+                <div class="grid md:grid-cols-3 gap-4 mb-6">
+                    <div class="bg-white p-4 rounded-lg shadow border-l-4 border-blue-500">
+                        <div class="flex items-center mb-2">
+                            <div class="w-3 h-3 bg-blue-500 rounded-full mr-2"></div>
+                            <span class="font-medium">GPT-4</span>
+                        </div>
+                        <div class="text-sm text-gray-600">OpenAI - Analytical Reasoning</div>
+                        <div id="status1" class="text-xs mt-2 text-gray-400">Ready</div>
+                    </div>
+                    <div class="bg-white p-4 rounded-lg shadow border-l-4 border-purple-500">
+                        <div class="flex items-center mb-2">
+                            <div class="w-3 h-3 bg-purple-500 rounded-full mr-2"></div>
+                            <span class="font-medium">Claude</span>
+                        </div>
+                        <div class="text-sm text-gray-600">Anthropic - Ethical Reasoning</div>
+                        <div id="status2" class="text-xs mt-2 text-gray-400">Ready</div>
+                    </div>
+                    <div class="bg-white p-4 rounded-lg shadow border-l-4 border-green-500">
+                        <div class="flex items-center mb-2">
+                            <div class="w-3 h-3 bg-green-500 rounded-full mr-2"></div>
+                            <span class="font-medium">Gemini</span>
+                        </div>
+                        <div class="text-sm text-gray-600">Google - Multi-Modal Perspective</div>
+                        <div id="status3" class="text-xs mt-2 text-gray-400">Ready</div>
+                    </div>
+                </div>
+
+                <!-- Arguments Display -->
+                <div id="argumentsContainer" class="space-y-4 mb-6"></div>
+
+                <!-- Controls -->
+                <div class="bg-white p-4 rounded-lg shadow text-center">
+                    <button id="nextRoundBtn" onclick="nextRound()" style="display: none;" class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 mr-4">
+                        Next Round
+                    </button>
+                    <button id="consensusBtn" onclick="startConsensus()" style="display: none;" class="bg-green-600 text-white px-6 py-2 rounded-lg hover:bg-green-700">
+                        Build Consensus
+                    </button>
+                </div>
+            </div>
+
+            <!-- Consensus Phase -->
+            <div id="consensusPhase" style="display: none;">
+                <div class="bg-white rounded-lg shadow-lg p-6">
+                    <h2 class="text-2xl font-bold mb-4">🏆 Consensus Building</h2>
+                    <p class="text-gray-600 mb-6">Vote for the most compelling arguments from all three AI models:</p>
+                    
+                    <div id="votingContainer" class="space-y-4 mb-6"></div>
+                    
+                    <button onclick="showResults()" class="bg-purple-600 text-white px-6 py-3 rounded-lg hover:bg-purple-700">
+                        Show Final Results
+                    </button>
+                </div>
+            </div>
+
+            <!-- Results -->
+            <div id="results" style="display: none;">
+                <div class="bg-white rounded-lg shadow-lg p-6">
+                    <h2 class="text-2xl font-bold mb-4">🎯 Final Consensus Results</h2>
+                    <div id="resultsContainer"></div>
+                    <button onclick="resetDebate()" class="mt-6 bg-gray-600 text-white px-6 py-3 rounded-lg hover:bg-gray-700">
+                        Start New Debate
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+<script>
+// Global variables
+var apiKeys = {};
+var currentRound = 1;
+var maxRounds = 3;
+var debateArguments = [];
+var votes = {};
+var isDemoMode = false;
+
+// Demo responses for all three models
+var demoResponses = {
+    1: {
+        gpt4: "Based on current research and data analysis, this topic presents compelling evidence in multiple directions. Statistical trends and empirical studies suggest measurable impacts on productivity, economic outcomes, and social structures that merit serious consideration.",
+        claude: "From an ethical perspective, we must carefully examine the implications for human autonomy, fairness, and long-term societal wellbeing. While there are potential benefits, we should consider unintended consequences and ensure any changes align with our fundamental values.",
+        gemini: "This multifaceted issue requires examining various stakeholder perspectives, cultural contexts, and implementation scenarios. The optimal approach likely involves balancing competing interests while considering both immediate practical needs and long-term strategic implications."
+    },
+    2: {
+        gpt4: "Building on the evidence from round one, let me address the counterarguments with additional data points. Recent studies show correlation patterns that support certain positions, though we must account for confounding variables and methodological limitations.",
+        claude: "I appreciate the analytical approach presented, but we must also consider the moral framework within which these decisions are made. Questions of justice, equity, and human dignity should guide our evaluation alongside purely utilitarian calculations.",
+        gemini: "The previous arguments highlight important tensions between efficiency and equity, individual choice and collective benefit. Perhaps the most constructive path forward involves pilot programs that allow us to test assumptions while minimizing potential harm."
+    },
+    3: {
+        gpt4: "In conclusion, the weight of quantitative evidence suggests a measured approach with robust monitoring systems. Implementation should be data-driven with clear success metrics and adjustment mechanisms based on real-world outcomes.",
+        claude: "To synthesize my position: while change may be beneficial, we must proceed with wisdom and humility, ensuring that our pursuit of progress does not compromise the dignity and wellbeing of those most vulnerable in our society.",
+        gemini: "This debate demonstrates the value of diverse perspectives in complex decision-making. The strongest solutions will likely emerge from continued dialogue that integrates analytical rigor, ethical reflection, and practical wisdom."
+    }
+};
+
+// API call functions
+async function callOpenAI(prompt) {
+    if (!apiKeys.openai) {
+        throw new Error('OpenAI API key not provided');
+    }
+    
+    try {
+        var response = await fetch('https://api.openai.com/v1/chat/completions', {
+            method: 'POST',
+            headers: {
+                'Authorization': 'Bearer ' + apiKeys.openai,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                model: "gpt-4",
+                messages: [
+                    {
+                        role: "system", 
+                        content: "You are participating in a respectful debate. Provide thoughtful, evidence-based arguments in 2-3 sentences. Focus on analytical reasoning and data."
+                    },
+                    {
+                        role: "user", 
+                        content: prompt
+                    }
+                ],
+                max_tokens: 150,
+                temperature: 0.7
+            })
+        });
+        
+        if (!response.ok) {
+            throw new Error('OpenAI API error: ' + response.status);
+        }
+        
+        var data = await response.json();
+        return data.choices[0].message.content;
+    } catch (error) {
+        console.error('OpenAI API call failed:', error);
+        return demoResponses[currentRound].gpt4;
+    }
+}
+
+async function callAnthropic(prompt) {
+    if (!apiKeys.anthropic) {
+        throw new Error('Anthropic API key not provided');
+    }
+    
+    try {
+        var response = await fetch('https://api.anthropic.com/v1/messages', {
+            method: 'POST',
+            headers: {
+                'x-api-key': apiKeys.anthropic,
+                'Content-Type': 'application/json',
+                'anthropic-version': '2023-06-01'
+            },
+            body: JSON.stringify({
+                model: "claude-3-sonnet-20240229",
+                max_tokens: 150,
+                messages: [
+                    {
+                        role: "user",
+                        content: "You are participating in a respectful debate. Focus on ethical reasoning and long-term implications. Provide thoughtful arguments in 2-3 sentences. Topic: " + prompt
+                    }
+                ]
+            })
+        });
+        
+        if (!response.ok) {
+            throw new Error('Anthropic API error: ' + response.status);
+        }
+        
+        var data = await response.json();
+        return data.content[0].text;
+    } catch (error) {
+        console.error('Anthropic API call failed:', error);
+        return demoResponses[currentRound].claude;
+    }
+}
+
+async function callGemini(prompt) {
+    if (!apiKeys.gemini) {
+        throw new Error('Gemini API key not provided');
+    }
+    
+    try {
+        var response = await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=' + apiKeys.gemini, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                contents: [{
+                    parts: [{
+                        text: "You are participating in a respectful debate. Provide balanced, multi-perspective analysis in 2-3 sentences. Consider various viewpoints and practical implications. Topic: " + prompt
+                    }]
+                }],
+                generationConfig: {
+                    temperature: 0.7,
+                    maxOutputTokens: 150
+                }
+            })
+        });
+        
+        if (!response.ok) {
+            throw new Error('Gemini API error: ' + response.status);
+        }
+        
+        var data = await response.json();
+        return data.candidates[0].content.parts[0].text;
+    } catch (error) {
+        console.error('Gemini API call failed:', error);
+        return demoResponses[currentRound].gemini;
+    }
+}
+
+function saveKeys() {
+    apiKeys.openai = document.getElementById('openaiKey').value;
+    apiKeys.anthropic = document.getElementById('anthropicKey').value;
+    apiKeys.gemini = document.getElementById('geminiKey').value;
+    
+    if (!apiKeys.openai && !apiKeys.anthropic && !apiKeys.gemini) {
+        alert('Please enter at least one API key, or use demo mode.');
+        return;
+    }
+    
+    document.getElementById('apiSetup').style.display = 'none';
+    document.getElementById('mainApp').style.display = 'block';
+}
+
+function useDemoMode() {
+    isDemoMode = true;
+    document.getElementById('apiSetup').style.display = 'none';
+    document.getElementById('mainApp').style.display = 'block';
+}
+
+function setTopic(topic) {
+    document.getElementById('topicInput').value = topic;
+}
+
+function startDebate() {
+    var topic = document.getElementById('topicInput').value;
+    if (!topic.trim()) {
+        alert('Please enter a debate topic.');
+        return;
+    }
+
+    document.getElementById('currentTopic').textContent = topic;
+    document.getElementById('topicSetup').style.display = 'none';
+    document.getElementById('debateArena').style.display = 'block';
+    
+    // Reset variables
+    currentRound = 1;
+    debateArguments = [];
+    votes = {};
+    
+    // Start first round
+    generateRound();
+}
+
+async function generateRound() {
+    updateProgress();
+    
+    // Show thinking status
+    document.getElementById('status1').textContent = 'Thinking...';
+    document.getElementById('status2').textContent = 'Thinking...';
+    document.getElementById('status3').textContent = 'Thinking...';
+    
+    var topic = document.getElementById('currentTopic').textContent;
+    var roundPrompt = 'Round ' + currentRound + ' of ' + maxRounds + ': ' + topic;
+    
+    var responses = {};
+    
+    try {
+        if (isDemoMode) {
+            // Simulate thinking delay
+            await new Promise(function(resolve) {
+                setTimeout(resolve, 2000);
+            });
+            responses = {
+                gpt4: demoResponses[currentRound].gpt4,
+                claude: demoResponses[currentRound].claude,
+                gemini: demoResponses[currentRound].gemini
+            };
+        } else {
+            // Make real API calls
+            var promises = [];
+            
+            if (apiKeys.openai) {
+                promises.push(
+                    callOpenAI(roundPrompt).then(function(result) {
+                        responses.gpt4 = result;
+                        document.getElementById('status1').textContent = 'Complete';
+                    })
+                );
+            } else {
+                responses.gpt4 = demoResponses[currentRound].gpt4;
+                document.getElementById('status1').textContent = 'Demo Mode';
+            }
+            
+            if (apiKeys.anthropic) {
+                promises.push(
+                    callAnthropic(roundPrompt).then(function(result) {
+                        responses.claude = result;
+                        document.getElementById('status2').textContent = 'Complete';
+                    })
+                );
+            } else {
+                responses.claude = demoResponses[currentRound].claude;
+                document.getElementById('status2').textContent = 'Demo Mode';
+            }
+            
+            if (apiKeys.gemini) {
+                promises.push(
+                    callGemini(roundPrompt).then(function(result) {
+                        responses.gemini = result;
+                        document.getElementById('status3').textContent = 'Complete';
+                    })
+                );
+            } else {
+                responses.gemini = demoResponses[currentRound].gemini;
+                document.getElementById('status3').textContent = 'Demo Mode';
+            }
+            
+            // Wait for all API calls to complete
+            await Promise.all(promises);
+        }
+        
+        // Display arguments
+        displayArguments(responses);
+        
+        // Update status for demo mode
+        if (isDemoMode) {
+            document.getElementById('status1').textContent = 'Demo Complete';
+            document.getElementById('status2').textContent = 'Demo Complete';
+            document.getElementById('status3').textContent = 'Demo Complete';
+        }
+        
+        // Show next round or consensus button
+        if (currentRound < maxRounds) {
+            document.getElementById('nextRoundBtn').style.display = 'inline-block';
+        } else {
+            document.getElementById('consensusBtn').style.display = 'inline-block';
+        }
+        
+    } catch (error) {
+        console.error('Error generating responses:', error);
+        alert('Error generating responses. Using demo mode for this round.');
+        
+        responses = {
+            gpt4: demoResponses[currentRound].gpt4,
+            claude: demoResponses[currentRound].claude,
+            gemini: demoResponses[currentRound].gemini
+        };
+        displayArguments(responses);
+    }
+}
+
+function displayArguments(responses) {
+    var container = document.getElementById('argumentsContainer');
+    var roundDiv = document.createElement('div');
+    roundDiv.className = 'bg-white rounded-lg shadow p-6';
+    
+    var html = '<h3 class="text-lg font-bold mb-4">Round ' + currentRound + ' Arguments</h3>';
+    html += '<div class="space-y-4">';
+    
+    // GPT-4
+    html += '<div class="border-l-4 border-blue-500 pl-4 bg-blue-50 p-3 rounded">';
+    html += '<div class="flex items-center mb-2">';
+    html += '<div class="w-3 h-3 bg-blue-500 rounded-full mr-2"></div>';
+    html += '<span class="font-medium">GPT-4 (OpenAI)</span>';
+    html += '</div>';
+    html += '<p class="text-gray-700">' + responses.gpt4 + '</p>';
+    html += '</div>';
+    
+    // Claude
+    html += '<div class="border-l-4 border-purple-500 pl-4 bg-purple-50 p-3 rounded">';
+    html += '<div class="flex items-center mb-2">';
+    html += '<div class="w-3 h-3 bg-purple-500 rounded-full mr-2"></div>';
+    html += '<span class="font-medium">Claude (Anthropic)</span>';
+    html += '</div>';
+    html += '<p class="text-gray-700">' + responses.claude + '</p>';
+    html += '</div>';
+    
+    // Gemini
+    html += '<div class="border-l-4 border-green-500 pl-4 bg-green-50 p-3 rounded">';
+    html += '<div class="flex items-center mb-2">';
+    html += '<div class="w-3 h-3 bg-green-500 rounded-full mr-2"></div>';
+    html += '<span class="font-medium">Gemini (Google)</span>';
+    html += '</div>';
+    html += '<p class="text-gray-700">' + responses.gemini + '</p>';
+    html += '</div>';
+    
+    html += '</div>';
+    roundDiv.innerHTML = html;
+    
+    container.appendChild(roundDiv);
+    debateArguments.push({
+        round: currentRound,
+        responses: responses
+    });
+}
+
+function updateProgress() {
+    var progressPercent = (currentRound / maxRounds) * 100;
+    document.getElementById('progressBar').style.width = progressPercent + '%';
+    document.getElementById('progressText').textContent = 'Round ' + currentRound + ' of ' + maxRounds;
+}
+
+function nextRound() {
+    currentRound++;
+    document.getElementById('nextRoundBtn').style.display = 'none';
+    generateRound();
+}
+
+function startConsensus() {
+    document.getElementById('debateArena').style.display = 'none';
+    document.getElementById('consensusPhase').style.display = 'block';
+    
+    displayVotingOptions();
+}
+
+function displayVotingOptions() {
+    var container = document.getElementById('votingContainer');
+    container.innerHTML = '';
+    
+    for (var i = 0; i < debateArguments.length; i++) {
+        var round = debateArguments[i];
+        var models = ['gpt4', 'claude', 'gemini'];
+        
+        for (var j = 0; j < models.length; j++) {
+            var model = models[j];
+            var response = round.responses[model];
+            var voteId = i + '-' + model;
+            
+            var voteDiv = document.createElement('div');
+            voteDiv.className = 'border rounded-lg p-4 hover:bg-gray-50 transition-colors';
+            
+            var modelColor = 'blue';
+            var modelName = 'GPT-4';
+            if (model === 'claude') {
+                modelColor = 'purple';
+                modelName = 'Claude';
+            }
+            if (model === 'gemini') {
+                modelColor = 'green';
+                modelName = 'Gemini';
+            }
+            
+            var html = '<div class="flex justify-between items-start mb-2">';
+            html += '<div class="flex items-center">';
+            html += '<div class="w-3 h-3 bg-' + modelColor + '-500 rounded-full mr-2"></div>';
+            html += '<span class="font-medium">' + modelName + '</span>';
+            html += '<span class="text-sm text-gray-500 ml-2">Round ' + (i + 1) + '</span>';
+            html += '</div>';
+            html += '<button onclick="vote(\'' + voteId + '\')" class="bg-' + modelColor + '-600 text-white px-3 py-1 rounded hover:bg-' + modelColor + '-700 transition-colors">';
+            html += 'Vote (<span id="votes-' + voteId + '">0</span>)';
+            html += '</button>';
+            html += '</div>';
+            html += '<p class="text-gray-700 leading-relaxed">' + response + '</p>';
+            
+            voteDiv.innerHTML = html;
+            container.appendChild(voteDiv);
+        }
+    }
+}
+
+function vote(voteId) {
+    if (!votes[voteId]) votes[voteId] = 0;
+    votes[voteId]++;
+    document.getElementById('votes-' + voteId).textContent = votes[voteId];
+}
+
+function showResults() {
+    document.getElementById('consensusPhase').style.display = 'none';
+    document.getElementById('results').style.display = 'block';
+    
+    // Sort votes
+    var sortedVotes = [];
+    for (var voteId in votes) {
+        sortedVotes.push([voteId, votes[voteId]]);
+    }
+    sortedVotes.sort(function(a, b) { return b[1] - a[1]; });
+    
+    var container = document.getElementById('resultsContainer');
+    container.innerHTML = '<h3 class="text-lg font-bold mb-4">🏆 Most Compelling Arguments (Community Choice):</h3>';
+    
+    for (var i = 0; i < Math.min(3, sortedVotes.length); i++) {
+        var voteId = sortedVotes[i][0];
+        var count = sortedVotes[i][1];
+        var parts = voteId.split('-');
+        var roundIndex = parseInt(parts[0]);
+        var model = parts[1];
+        var response = debateArguments[roundIndex].responses[model];
+        
+        var resultDiv = document.createElement('div');
+        var bgClass = i === 0 ? 'bg-yellow-50 border-yellow-200' : 'bg-gray-50';
+        resultDiv.className = 'border rounded-lg p-4 mb-4 ' + bgClass;
+        
+        var emoji = '👍';
+        if (i === 0) emoji = '🏆';
+        if (i === 1) emoji = '🥈';
+        if (i === 2) emoji = '🥉';
+        
+        var modelColor = 'blue';
+        var modelName = 'GPT-4';
+        if (model === 'claude') {
+            modelColor = 'purple';
+            modelName = 'Claude';
+        }
+        if (model === 'gemini') {
+            modelColor = 'green';
+            modelName = 'Gemini';
+        }
+        
+        var html = '<div class="flex justify-between items-center mb-3">';
+        html += '<div class="flex items-center">';
+        html += '<span class="text-2xl mr-2">' + emoji + '</span>';
+        html += '<div class="w-4 h-4 bg-' + modelColor + '-500 rounded-full mr-2"></div>';
+        html += '<span class="font-bold">' + modelName + '</span>';
+        html += '<span class="text-sm text-gray-500 ml-2">Round ' + (roundIndex + 1) + '</span>';
+        html += '</div>';
+        html += '<span class="font-bold text-green-600 text-lg">' + count + ' votes</span>';
+        html += '</div>';
+        html += '<p class="text-gray-700 leading-relaxed font-medium">' + response + '</p>';
+        
+        resultDiv.innerHTML = html;
+        container.appendChild(resultDiv);
+    }
+    
+    // Add summary
+    var summaryDiv = document.createElement('div');
+    summaryDiv.className = 'mt-6 p-4 bg-blue-50 border-l-4 border-blue-500 rounded';
+    summaryDiv.innerHTML = '<h4 class="font-bold mb-2">🎯 Debate Summary</h4><p class="text-sm text-gray-700">This consensus was built from ' + debateArguments.length + ' rounds of debate between three leading AI models, with community voting determining the most compelling arguments.</p>';
+    container.appendChild(summaryDiv);
+}
+
+function resetDebate() {
+    // Reset all displays
+    document.getElementById('results').style.display = 'none';
+    document.getElementById('consensusPhase').style.display = 'none';
+    document.getElementById('debateArena').style.display = 'none';
+    document.getElementById('topicSetup').style.display = 'block';
+    
+    // Clear inputs and containers
+    document.getElementById('topicInput').value = '';
+    document.getElementById('argumentsContainer').innerHTML = '';
+    document.getElementById('votingContainer').innerHTML = '';
+    document.getElementById('resultsContainer').innerHTML = '';
+    
+    // Reset buttons
+    document.getElementById('nextRoundBtn').style.display = 'none';
+    document.getElementById('consensusBtn').style.display = 'none';
+    
+    // Reset variables
+    currentRound = 1;
+    debateArguments = [];
+    votes = {};
+    
+    // Reset progress bar
+    updateProgress();
+    
+    // Reset status displays
+    document.getElementById('status1').textContent = 'Ready';
+    document.getElementById('status2').textContent = 'Ready';
+    document.getElementById('status3').textContent = 'Ready';
+}
+</script>
+
+</body>
+</html>
