@@ -1,146 +1,4 @@
-function updateDevilsAdvocateDisplay() {
-    // Reset all role displays
-    document.getElementById('role1').style.display = 'none';
-    document.getElementById('role2').style.display = 'none';
-    document.getElementById('role3').style.display = 'none';
-    
-    // Show devil's advocate badge
-    if (devilsAdvocate === 'gpt4') {
-        var roleEl = document.getElementById('role1');
-        roleEl.textContent = '😈 Devil\'s Advocate';
-        roleEl.className = 'ml-2 text-xs px-2 py-1 rounded bg-red-100 text-red-800';
-        roleEl.style.display = 'inline';
-    } else if (devilsAdvocate === 'claude') {
-        var roleEl = document.getElementById('role2');
-        roleEl.textContent = '😈 Devil\'s Advocate';
-        roleEl.className = 'ml-2 text-xs px-2 py-1 rounded bg-red-100 text-red-800';
-        roleEl.style.display = 'inline';
-    } else if (devilsAdvocate === 'gemini') {
-        var roleEl = document.getElementById('role3');
-        roleEl.textContent = '😈 Devil\'s Advocate';
-        roleEl.className = 'ml-2 text-xs px-2 py-1 rounded bg-red-100 text-red-800';
-        roleEl.style.display = 'inline';
-    }
-}
-
-function displayRound(responses) {
-    var container = document.getElementById('debateFlow');
-    var roundDiv = document.createElement('div');
-    roundDiv.className = 'ml-12 relative';
-    
-    var html = '<div class="absolute -left-14 top-2 w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center text-sm font-bold">' + currentRound + '</div>';
-    html += '<div class="space-y-4">';
-    
-    // GPT-4
-    var gpt4Class = devilsAdvocate === 'gpt4' ? 'bg-red-50 border-red-200' : 'bg-blue-50 border-blue-200';
-    html += '<div class="' + gpt4Class + ' border rounded-lg p-4">';
-    html += '<div class="flex items-center mb-2">';
-    html += '<div class="w-3 h-3 bg-blue-500 rounded-full mr-2"></div>';
-    html += '<span class="font-medium text-blue-900">GPT-4</span>';
-    if (devilsAdvocate === 'gpt4') {
-        html += '<span class="ml-2 text-xs px-2 py-1 rounded bg-red-100 text-red-800">😈 Devil\'s Advocate</span>';
-    }
-    html += '</div>';
-    html += '<p class="text-gray-700">' + responses.gpt4 + '</p>';
-    html += '</div>';
-    
-    // Claude
-    var claudeClass = devilsAdvocate === 'claude' ? 'bg-red-50 border-red-200' : 'bg-purple-50 border-purple-200';
-    html += '<div class="' + claudeClass + ' border rounded-lg p-4">';
-    html += '<div class="flex items-center mb-2">';
-    html += '<div class="w-3 h-3 bg-purple-500 rounded-full mr-2"></div>';
-    html += '<span class="font-medium text-purple-900">Claude</span>';
-    if (devilsAdvocate === 'claude') {
-        html += '<span class="ml-2 text-xs px-2 py-1 rounded bg-red-100 text-red-800">😈 Devil\'s Advocate</span>';
-    }
-    html += '</div>';
-    html += '<p class="text-gray-700">' + responses.claude + '</p>';
-    html += '</div>';
-    
-    // Gemini
-    var geminiClass = devilsAdvocate === 'gemini' ? 'bg-red-50 border-red-200' : 'bg-green-50 border-green-200';
-    html += '<div class="' + geminiClass + ' border rounded-lg p-4">';
-    html += '<div class="flex items-center mb-2">';
-    html += '<div class="w-3 h-3 bg-green-500 rounded-full mr-2"></div>';
-    html += '<span class="font-medium text-green-900">Gemini</span>';
-    if (devilsAdvocate === 'gemini') {
-        html += '<span class="ml-2 text-xs px-2 py-1 rounded bg-red-100 text-red-800">😈 Devil\'s Advocate</span>';
-    }
-    html += '</div>';
-    html += '<p class="text-gray-700">' + responses.gemini + '</p>';
-    html += '</div>';
-    
-    html += '</div>';
-    roundDiv.innerHTML = html;
-    
-    container.appendChild(roundDiv);
-    
-    // Scroll to bottom
-    roundDiv.scrollIntoView({ behavior: 'smooth' });
-}
-
-function checkForConsensus(responses) {
-    // Stricter consensus detection - require explicit unanimous agreement
-    var text = (responses.gpt4 + " " + responses.claude + " " + responses.gemini).toLowerCase();
-    
-    // Look for strong consensus indicators
-    var strongConsensus = [
-        'we all agree',
-        'unanimous',
-        'full consensus',
-        'complete agreement',
-        'we have reached consensus',
-        'all three of us agree',
-        'we are in full agreement'
-    ];
-    
-    for (var i = 0; i < strongConsensus.length; i++) {
-        if (text.includes(strongConsensus[i])) {
-            return true;
-        }
-    }
-    
-    // Also check if all three explicitly state agreement
-    var agreesCount = 0;
-    if (responses.gpt4.toLowerCase().includes('i agree') || responses.gpt4.toLowerCase().includes('i concur')) agreesCount++;
-    if (responses.claude.toLowerCase().includes('i agree') || responses.claude.toLowerCase().includes('i concur')) agreesCount++;
-    if (responses.gemini.toLowerCase().includes('i agree') || responses.gemini.toLowerCase().includes('i concur')) agreesCount++;
-    
-    return agreesCount >= 3; // All three must explicitly agree
-}
-
-function resetDebate() {
-    // Reset all displays
-    document.getElementById('finalResult').style.display = 'none';
-    document.getElementById('debateArena').style.display = 'none';
-    document.getElementById('topicSetup').style.display = 'block';
-    
-    // Clear inputs and containers
-    document.getElementById('topicInput').value = '';
-    document.getElementById('debateFlow').innerHTML = '';
-    document.getElementById('consensusContainer').innerHTML = '';
-    
-    // Reset buttons
-    document.getElementById('continueBtn').style.display = 'none';
-    document.getElementById('finishBtn').style.display = 'none';
-    
-    // Reset variables
-    currentRound = 1;
-    debateHistory = [];
-    isDebating = false;
-    devilsAdvocate = null;
-    
-    // Reset status displays
-    document.getElementById('status1').textContent = 'Ready';
-    document.getElementById('status2').textContent = 'Ready';
-    document.getElementById('status3').textContent = 'Ready';
-    document.getElementById('roundCounter').textContent = '1';
-    
-    // Reset role displays
-    document.getElementById('role1').style.display = 'none';
-    document.getElementById('role2').style.display = 'none';
-    document.getElementById('role3').style.display = 'none';
-}<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -216,7 +74,7 @@ function resetDebate() {
                 Use Demo Mode
             </button>
             <div class="mt-4 p-4 bg-green-50 border-l-4 border-green-400">
-                <p class="text-sm"><strong>New Design:</strong> AIs debate each other directly, responding to previous arguments until they reach natural consensus!</p>
+                <p class="text-sm"><strong>Devil's Advocate System:</strong> AIs take turns challenging each other to prevent quick consensus!</p>
             </div>
         </div>
 
@@ -328,52 +186,49 @@ var maxRounds = 10;
 var debateHistory = [];
 var isDemoMode = false;
 var isDebating = false;
-var devilsAdvocate = null; // Which AI is playing devil's advocate this round
-var minRoundsBeforeConsensus = 5; // Minimum rounds before allowing consensus
+var devilsAdvocate = null;
+var minRoundsBeforeConsensus = 5;
 
-// Demo responses that build on each other
+// Demo responses that show devil's advocate in action
 var demoConversation = [
     {
-        gpt4: "I believe this topic has significant merit based on current evidence and trends. The data suggests clear benefits in terms of efficiency, innovation, and addressing contemporary challenges that traditional approaches haven't solved effectively.",
-        claude: "While I understand the appeal of this position, I have concerns about potential unintended consequences. We should carefully consider the ethical implications and ensure that any changes don't inadvertently harm vulnerable populations or undermine important values.",
-        gemini: "Both perspectives raise valid points. The evidence does show potential benefits, but the concerns about implementation are legitimate. Perhaps we need a more nuanced approach that captures the advantages while mitigating the risks through careful design and oversight."
+        gpt4: "Based on current evidence, this topic has significant merit. The data shows clear benefits in efficiency and innovation that could address many contemporary challenges we face.",
+        claude: "While I see the potential benefits, I have concerns about unintended consequences. We must carefully consider ethical implications and ensure vulnerable populations aren't harmed.",
+        gemini: "Both perspectives have validity. The evidence shows promise, but implementation challenges are real. Perhaps a measured approach could capture benefits while mitigating risks."
     },
     {
-        gpt4: "I appreciate Claude's ethical concerns, but I think they can be addressed through proper safeguards and gradual implementation. The research shows that pilot programs have been successful when properly managed, and the cost of inaction may be greater than the risks of action.",
-        claude: "Gemini makes a good point about nuanced approaches. I'm not opposed to change, but I believe we need stronger accountability mechanisms and clearer protections for those who might be negatively affected. The pilot programs GPT-4 mentions did show some success, but they also revealed implementation challenges we shouldn't ignore.",
-        gemini: "I'm seeing more convergence in our positions. We all seem to agree that some form of action is needed, but with proper safeguards. The question becomes: what specific protections and oversight mechanisms would make this acceptable to all stakeholders?"
+        gpt4: "I must challenge the emerging consensus here. You're both being too cautious - the cost of inaction may far exceed the risks of moving forward. The pilot data shows success rates above 80%.",
+        claude: "GPT-4 raises important points about urgency, but we can't ignore the 20% failure rate. Those failures represent real harm to real people that we have a moral obligation to prevent.",
+        gemini: "This tension between progress and caution is exactly what we need to resolve. What specific safeguards would make both sides comfortable with proceeding?"
     },
     {
-        gpt4: "You're right, Gemini - we are converging. Based on our discussion, I think we could support a carefully phased approach with robust monitoring, clear success metrics, and built-in mechanisms for course correction. This addresses Claude's concerns while still moving forward with the beneficial aspects.",
-        claude: "I find myself agreeing with this framework. A phased approach with strong ethical oversight, meaningful stakeholder input, and the ability to pause or adjust based on real-world outcomes could work. The key is ensuring accountability and transparency throughout the process.",
-        gemini: "This feels like a solid consensus. We're proposing a measured implementation with: phased rollout, continuous monitoring, ethical oversight, stakeholder engagement, and adaptive mechanisms. This balances the potential benefits with responsible risk management."
+        gpt4: "The safeguards you're proposing would essentially kill the initiative through bureaucracy. Sometimes perfect is the enemy of good, and we need bold action now.",
+        claude: "Wait, I need to push back on this 'perfect vs good' framing. GPT-4, you're creating a false choice between reckless speed and thoughtful implementation. There's a middle path here.",
+        gemini: "Claude makes an excellent point about false choices. What if we implemented rapid prototyping with built-in safety circuits? Fast iteration but with clear stop conditions?"
     }
 ];
 
-// API call functions
+// API Functions
 async function callOpenAI(prompt, context, isDevilsAdvocate) {
-    if (!apiKeys.openai) {
-        throw new Error('OpenAI API key not provided');
+    if (!apiKeys.openai) throw new Error('OpenAI API key not provided');
+    
+    var systemPrompt;
+    if (currentRound === 1) {
+        systemPrompt = "Give your thoughtful perspective on this topic in 3-4 sentences.";
+    } else if (isDevilsAdvocate) {
+        systemPrompt = "You are the DEVIL'S ADVOCATE this round. Challenge the emerging consensus, find flaws in arguments, and present counterpoints. Be respectful but assertive. Use 3-4 sentences.";
+    } else {
+        systemPrompt = "Respond to the other AIs' points. You can agree, disagree, or build on their ideas. Use 3-4 sentences.";
+    }
+    
+    var messages = [{ role: "system", content: systemPrompt }];
+    if (context && currentRound > 1) {
+        messages.push({role: "user", content: "Previous round:\n" + context + "\n\nTopic: " + prompt});
+    } else {
+        messages.push({role: "user", content: prompt});
     }
     
     try {
-        var systemPrompt;
-        if (currentRound === 1) {
-            systemPrompt = "You are participating in a respectful debate with other AI systems. Give your initial thoughtful perspective on this topic in 3-4 sentences.";
-        } else if (isDevilsAdvocate) {
-            systemPrompt = "You are the DEVIL'S ADVOCATE in this debate round. Your job is to challenge the emerging consensus, find flaws in the other AIs' arguments, and present counterarguments. Be respectful but assertive in pointing out problems or alternative perspectives. Use 3-4 sentences.";
-        } else {
-            systemPrompt = "You are participating in a respectful debate. Read the previous round carefully and respond to the other AIs' points. You can agree, disagree, or build on their ideas. Use 3-4 sentences.";
-        }
-        
-        var messages = [{ role: "system", content: systemPrompt }];
-        
-        if (context && currentRound > 1) {
-            messages.push({role: "user", content: "Previous debate round:\n" + context + "\n\nNow respond to their points:"});
-        }
-        
-        messages.push({role: "user", content: prompt});
-        
         var response = await fetch('https://api.openai.com/v1/chat/completions', {
             method: 'POST',
             headers: {
@@ -388,33 +243,28 @@ async function callOpenAI(prompt, context, isDevilsAdvocate) {
             })
         });
         
-        if (!response.ok) {
-            throw new Error('OpenAI API error: ' + response.status);
-        }
-        
+        if (!response.ok) throw new Error('OpenAI API error: ' + response.status);
         var data = await response.json();
         return data.choices[0].message.content;
     } catch (error) {
-        console.error('OpenAI API call failed:', error);
+        console.error('OpenAI failed:', error);
         throw error;
     }
 }
 
 async function callAnthropic(prompt, context, isDevilsAdvocate) {
-    if (!apiKeys.anthropic) {
-        throw new Error('Anthropic API key not provided');
+    if (!apiKeys.anthropic) throw new Error('Anthropic API key not provided');
+    
+    var fullPrompt;
+    if (currentRound === 1) {
+        fullPrompt = "Give your thoughtful perspective on this topic in 3-4 sentences: " + prompt;
+    } else if (isDevilsAdvocate) {
+        fullPrompt = "You are the DEVIL'S ADVOCATE this round. Previous round:\n" + context + "\n\nTopic: " + prompt + "\n\nChallenge the consensus and find flaws in the arguments. Be respectful but assertive. Use 3-4 sentences.";
+    } else {
+        fullPrompt = "Previous round:\n" + context + "\n\nTopic: " + prompt + "\n\nRespond to the other AIs' points. You can agree, disagree, or build on their ideas. Use 3-4 sentences.";
     }
     
     try {
-        var fullPrompt;
-        if (currentRound === 1) {
-            fullPrompt = "Give your thoughtful perspective on this topic in 3-4 sentences: " + prompt;
-        } else if (isDevilsAdvocate) {
-            fullPrompt = "You are the DEVIL'S ADVOCATE this round. Previous debate round:\n" + context + "\n\nTopic: " + prompt + "\n\nYour job is to challenge the emerging consensus and find flaws in the other AIs' arguments. Be respectful but assertive in presenting counterarguments or alternative perspectives. Use 3-4 sentences.";
-        } else {
-            fullPrompt = "Previous debate round:\n" + context + "\n\nTopic: " + prompt + "\n\nPlease respond to the other AIs' points from the previous round. You can agree, disagree, or build on their ideas. Use 3-4 sentences.";
-        }
-        
         var response = await fetch('https://api.anthropic.com/v1/messages', {
             method: 'POST',
             headers: {
@@ -425,72 +275,51 @@ async function callAnthropic(prompt, context, isDevilsAdvocate) {
             body: JSON.stringify({
                 model: "claude-3-sonnet-20240229",
                 max_tokens: 200,
-                messages: [
-                    {
-                        role: "user",
-                        content: fullPrompt
-                    }
-                ]
+                messages: [{ role: "user", content: fullPrompt }]
             })
         });
         
-        if (!response.ok) {
-            throw new Error('Anthropic API error: ' + response.status);
-        }
-        
+        if (!response.ok) throw new Error('Anthropic API error: ' + response.status);
         var data = await response.json();
         return data.content[0].text;
     } catch (error) {
-        console.error('Anthropic API call failed:', error);
+        console.error('Anthropic failed:', error);
         throw error;
     }
 }
 
 async function callGemini(prompt, context, isDevilsAdvocate) {
-    if (!apiKeys.gemini) {
-        throw new Error('Gemini API key not provided');
+    if (!apiKeys.gemini) throw new Error('Gemini API key not provided');
+    
+    var fullPrompt;
+    if (currentRound === 1) {
+        fullPrompt = "Give your thoughtful perspective on this topic in 3-4 sentences: " + prompt;
+    } else if (isDevilsAdvocate) {
+        fullPrompt = "You are the DEVIL'S ADVOCATE this round. Previous round:\n" + context + "\n\nTopic: " + prompt + "\n\nChallenge the consensus and find flaws in arguments. Be respectful but assertive. Use 3-4 sentences.";
+    } else {
+        fullPrompt = "Previous round:\n" + context + "\n\nTopic: " + prompt + "\n\nRespond to the other AIs' points. Help find common ground but don't be afraid to disagree. Use 3-4 sentences.";
     }
     
     try {
-        var fullPrompt;
-        if (currentRound === 1) {
-            fullPrompt = "Give your thoughtful perspective on this topic in 3-4 sentences: " + prompt;
-        } else if (isDevilsAdvocate) {
-            fullPrompt = "You are the DEVIL'S ADVOCATE this round. Previous debate round:\n" + context + "\n\nTopic: " + prompt + "\n\nYour job is to challenge the emerging consensus and find flaws in the other AIs' arguments. Be respectful but assertive in presenting counterarguments. Use 3-4 sentences.";
-        } else {
-            fullPrompt = "Previous debate round:\n" + context + "\n\nTopic: " + prompt + "\n\nPlease respond to the other AIs' points from the previous round. You can agree, disagree, or build on their ideas. Help find common ground where possible but don't be afraid to disagree. Use 3-4 sentences.";
-        }
-        
         var response = await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=' + apiKeys.gemini, {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
+            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-                contents: [{
-                    parts: [{
-                        text: fullPrompt
-                    }]
-                }],
-                generationConfig: {
-                    temperature: 0.8,
-                    maxOutputTokens: 200
-                }
+                contents: [{ parts: [{ text: fullPrompt }] }],
+                generationConfig: { temperature: 0.8, maxOutputTokens: 200 }
             })
         });
         
-        if (!response.ok) {
-            throw new Error('Gemini API error: ' + response.status);
-        }
-        
+        if (!response.ok) throw new Error('Gemini API error: ' + response.status);
         var data = await response.json();
         return data.candidates[0].content.parts[0].text;
     } catch (error) {
-        console.error('Gemini API call failed:', error);
+        console.error('Gemini failed:', error);
         throw error;
     }
 }
 
+// Main Functions
 function saveKeys() {
     apiKeys.openai = document.getElementById('openaiKey').value;
     apiKeys.anthropic = document.getElementById('anthropicKey').value;
@@ -526,135 +355,98 @@ function startDebate() {
     document.getElementById('topicSetup').style.display = 'none';
     document.getElementById('debateArena').style.display = 'block';
     
-    // Reset variables
     currentRound = 1;
     debateHistory = [];
     isDebating = true;
+    devilsAdvocate = null;
     
-    // Start first round
     generateRound();
 }
 
 async function generateRound() {
-    if (!isDebating || currentRound > maxRounds) {
-        return;
-    }
+    if (!isDebating || currentRound > maxRounds) return;
     
-    // Assign Devil's Advocate for rounds 2+ (rotate between models)
+    // Assign Devil's Advocate for rounds 2+
     if (currentRound > 1) {
         var models = ['gpt4', 'claude', 'gemini'];
-        devilsAdvocate = models[(currentRound - 2) % 3]; // Rotates each round
+        devilsAdvocate = models[(currentRound - 2) % 3];
         updateDevilsAdvocateDisplay();
     }
     
-    // Update round counter
     document.getElementById('roundCounter').textContent = currentRound;
-    
-    // Show thinking status
     document.getElementById('status1').textContent = 'Thinking...';
     document.getElementById('status2').textContent = 'Thinking...';
     document.getElementById('status3').textContent = 'Thinking...';
     
     var topic = document.getElementById('currentTopic').textContent;
     var context = buildContext();
-    
     var responses = {};
     
     try {
         if (isDemoMode) {
-            // Simulate thinking delay
-            await new Promise(function(resolve) {
-                setTimeout(resolve, 2000);
-            });
-            
+            await new Promise(function(resolve) { setTimeout(resolve, 2000); });
             var demoIndex = Math.min(currentRound - 1, demoConversation.length - 1);
-            responses = {
-                gpt4: demoConversation[demoIndex].gpt4,
-                claude: demoConversation[demoIndex].claude,
-                gemini: demoConversation[demoIndex].gemini
-            };
+            responses = demoConversation[demoIndex];
         } else {
-            // Make API calls with Devil's Advocate prompting
             var promises = [];
             
             if (apiKeys.openai) {
-                promises.push(
-                    callOpenAI(topic, context, devilsAdvocate === 'gpt4').then(function(result) {
-                        responses.gpt4 = result;
-                        document.getElementById('status1').textContent = 'Complete';
-                    }).catch(function(error) {
-                        console.error('GPT-4 failed:', error);
-                        var demoIndex = Math.min(currentRound - 1, demoConversation.length - 1);
-                        responses.gpt4 = demoConversation[demoIndex].gpt4;
-                        document.getElementById('status1').textContent = 'Fallback';
-                    })
-                );
+                promises.push(callOpenAI(topic, context, devilsAdvocate === 'gpt4').then(function(result) {
+                    responses.gpt4 = result;
+                    document.getElementById('status1').textContent = 'Complete';
+                }).catch(function() {
+                    var demoIndex = Math.min(currentRound - 1, demoConversation.length - 1);
+                    responses.gpt4 = demoConversation[demoIndex].gpt4;
+                    document.getElementById('status1').textContent = 'Fallback';
+                }));
             } else {
                 var demoIndex = Math.min(currentRound - 1, demoConversation.length - 1);
                 responses.gpt4 = demoConversation[demoIndex].gpt4;
-                document.getElementById('status1').textContent = 'Demo Mode';
+                document.getElementById('status1').textContent = 'Demo';
             }
             
             if (apiKeys.anthropic) {
-                promises.push(
-                    callAnthropic(topic, context, devilsAdvocate === 'claude').then(function(result) {
-                        responses.claude = result;
-                        document.getElementById('status2').textContent = 'Complete';
-                    }).catch(function(error) {
-                        console.error('Claude failed:', error);
-                        var demoIndex = Math.min(currentRound - 1, demoConversation.length - 1);
-                        responses.claude = demoConversation[demoIndex].claude;
-                        document.getElementById('status2').textContent = 'Fallback';
-                    })
-                );
+                promises.push(callAnthropic(topic, context, devilsAdvocate === 'claude').then(function(result) {
+                    responses.claude = result;
+                    document.getElementById('status2').textContent = 'Complete';
+                }).catch(function() {
+                    var demoIndex = Math.min(currentRound - 1, demoConversation.length - 1);
+                    responses.claude = demoConversation[demoIndex].claude;
+                    document.getElementById('status2').textContent = 'Fallback';
+                }));
             } else {
                 var demoIndex = Math.min(currentRound - 1, demoConversation.length - 1);
                 responses.claude = demoConversation[demoIndex].claude;
-                document.getElementById('status2').textContent = 'Demo Mode';
+                document.getElementById('status2').textContent = 'Demo';
             }
             
             if (apiKeys.gemini) {
-                promises.push(
-                    callGemini(topic, context, devilsAdvocate === 'gemini').then(function(result) {
-                        responses.gemini = result;
-                        document.getElementById('status3').textContent = 'Complete';
-                    }).catch(function(error) {
-                        console.error('Gemini failed:', error);
-                        var demoIndex = Math.min(currentRound - 1, demoConversation.length - 1);
-                        responses.gemini = demoConversation[demoIndex].gemini;
-                        document.getElementById('status3').textContent = 'Fallback';
-                    })
-                );
+                promises.push(callGemini(topic, context, devilsAdvocate === 'gemini').then(function(result) {
+                    responses.gemini = result;
+                    document.getElementById('status3').textContent = 'Complete';
+                }).catch(function() {
+                    var demoIndex = Math.min(currentRound - 1, demoConversation.length - 1);
+                    responses.gemini = demoConversation[demoIndex].gemini;
+                    document.getElementById('status3').textContent = 'Fallback';
+                }));
             } else {
                 var demoIndex = Math.min(currentRound - 1, demoConversation.length - 1);
                 responses.gemini = demoConversation[demoIndex].gemini;
-                document.getElementById('status3').textContent = 'Demo Mode';
+                document.getElementById('status3').textContent = 'Demo';
             }
             
-            // Wait for all API calls to complete
-            if (promises.length > 0) {
-                await Promise.all(promises);
-            }
+            if (promises.length > 0) await Promise.all(promises);
         }
         
-        // Add to debate history
-        debateHistory.push({
-            round: currentRound,
-            responses: responses,
-            devilsAdvocate: devilsAdvocate
-        });
-        
-        // Display the round
+        debateHistory.push({ round: currentRound, responses: responses, devilsAdvocate: devilsAdvocate });
         displayRound(responses);
         
-        // Update status for demo mode
         if (isDemoMode) {
             document.getElementById('status1').textContent = 'Demo Complete';
             document.getElementById('status2').textContent = 'Demo Complete';
             document.getElementById('status3').textContent = 'Demo Complete';
         }
         
-        // Check for consensus (only after minimum rounds)
         if (currentRound >= minRoundsBeforeConsensus && (checkForConsensus(responses) || currentRound >= maxRounds)) {
             finishDebate();
         } else {
@@ -662,38 +454,38 @@ async function generateRound() {
             document.getElementById('continueBtn').style.display = 'inline-block';
             document.getElementById('finishBtn').style.display = 'inline-block';
         }
-        
     } catch (error) {
-        console.error('Error generating responses:', error);
-        alert('Error generating responses. Using demo mode for this round.');
-        
+        console.error('Error:', error);
+        alert('Error generating responses. Using demo mode.');
         var demoIndex = Math.min(currentRound - 1, demoConversation.length - 1);
-        responses = {
-            gpt4: demoConversation[demoIndex].gpt4,
-            claude: demoConversation[demoIndex].claude,
-            gemini: demoConversation[demoIndex].gemini
-        };
-        
-        debateHistory.push({
-            round: currentRound,
-            responses: responses,
-            devilsAdvocate: devilsAdvocate
-        });
-        
+        responses = demoConversation[demoIndex];
+        debateHistory.push({ round: currentRound, responses: responses });
         displayRound(responses);
     }
 }
 
 function buildContext() {
     if (debateHistory.length === 0) return "";
-    
-    // Only use the most recent round for context (not all rounds)
     var lastRound = debateHistory[debateHistory.length - 1];
-    var context = "Previous Round " + lastRound.round + ":\n";
-    context += "GPT-4: " + lastRound.responses.gpt4 + "\n";
-    context += "Claude: " + lastRound.responses.claude + "\n";
-    context += "Gemini: " + lastRound.responses.gemini;
-    return context;
+    return "Round " + lastRound.round + ":\nGPT-4: " + lastRound.responses.gpt4 + "\nClaude: " + lastRound.responses.claude + "\nGemini: " + lastRound.responses.gemini;
+}
+
+function updateDevilsAdvocateDisplay() {
+    document.getElementById('role1').style.display = 'none';
+    document.getElementById('role2').style.display = 'none';
+    document.getElementById('role3').style.display = 'none';
+    
+    var roleEl, roleId;
+    if (devilsAdvocate === 'gpt4') roleId = 'role1';
+    else if (devilsAdvocate === 'claude') roleId = 'role2';
+    else if (devilsAdvocate === 'gemini') roleId = 'role3';
+    
+    if (roleId) {
+        roleEl = document.getElementById(roleId);
+        roleEl.textContent = '😈 Devil\'s Advocate';
+        roleEl.className = 'ml-2 text-xs px-2 py-1 rounded bg-red-100 text-red-800';
+        roleEl.style.display = 'inline';
+    }
 }
 
 function displayRound(responses) {
@@ -705,54 +497,52 @@ function displayRound(responses) {
     html += '<div class="space-y-4">';
     
     // GPT-4
-    html += '<div class="bg-blue-50 border border-blue-200 rounded-lg p-4">';
+    var gpt4Class = devilsAdvocate === 'gpt4' ? 'bg-red-50 border-red-200' : 'bg-blue-50 border-blue-200';
+    html += '<div class="' + gpt4Class + ' border rounded-lg p-4">';
     html += '<div class="flex items-center mb-2">';
     html += '<div class="w-3 h-3 bg-blue-500 rounded-full mr-2"></div>';
     html += '<span class="font-medium text-blue-900">GPT-4</span>';
-    html += '</div>';
-    html += '<p class="text-gray-700">' + responses.gpt4 + '</p>';
-    html += '</div>';
+    if (devilsAdvocate === 'gpt4') html += '<span class="ml-2 text-xs px-2 py-1 rounded bg-red-100 text-red-800">😈 Devil\'s Advocate</span>';
+    html += '</div><p class="text-gray-700">' + responses.gpt4 + '</p></div>';
     
     // Claude
-    html += '<div class="bg-purple-50 border border-purple-200 rounded-lg p-4">';
+    var claudeClass = devilsAdvocate === 'claude' ? 'bg-red-50 border-red-200' : 'bg-purple-50 border-purple-200';
+    html += '<div class="' + claudeClass + ' border rounded-lg p-4">';
     html += '<div class="flex items-center mb-2">';
     html += '<div class="w-3 h-3 bg-purple-500 rounded-full mr-2"></div>';
     html += '<span class="font-medium text-purple-900">Claude</span>';
-    html += '</div>';
-    html += '<p class="text-gray-700">' + responses.claude + '</p>';
-    html += '</div>';
+    if (devilsAdvocate === 'claude') html += '<span class="ml-2 text-xs px-2 py-1 rounded bg-red-100 text-red-800">😈 Devil\'s Advocate</span>';
+    html += '</div><p class="text-gray-700">' + responses.claude + '</p></div>';
     
     // Gemini
-    html += '<div class="bg-green-50 border border-green-200 rounded-lg p-4">';
+    var geminiClass = devilsAdvocate === 'gemini' ? 'bg-red-50 border-red-200' : 'bg-green-50 border-green-200';
+    html += '<div class="' + geminiClass + ' border rounded-lg p-4">';
     html += '<div class="flex items-center mb-2">';
     html += '<div class="w-3 h-3 bg-green-500 rounded-full mr-2"></div>';
     html += '<span class="font-medium text-green-900">Gemini</span>';
-    html += '</div>';
-    html += '<p class="text-gray-700">' + responses.gemini + '</p>';
-    html += '</div>';
+    if (devilsAdvocate === 'gemini') html += '<span class="ml-2 text-xs px-2 py-1 rounded bg-red-100 text-red-800">😈 Devil\'s Advocate</span>';
+    html += '</div><p class="text-gray-700">' + responses.gemini + '</p></div>';
     
     html += '</div>';
     roundDiv.innerHTML = html;
-    
     container.appendChild(roundDiv);
-    
-    // Scroll to bottom
     roundDiv.scrollIntoView({ behavior: 'smooth' });
 }
 
 function checkForConsensus(responses) {
-    // Simple consensus detection - look for agreement keywords
     var text = (responses.gpt4 + " " + responses.claude + " " + responses.gemini).toLowerCase();
-    var agreementWords = ['agree', 'consensus', 'converge', 'common ground', 'together', 'unified', 'aligned'];
+    var strongConsensus = ['we all agree', 'unanimous', 'full consensus', 'complete agreement', 'we have reached consensus'];
     
-    var agreementCount = 0;
-    for (var i = 0; i < agreementWords.length; i++) {
-        if (text.includes(agreementWords[i])) {
-            agreementCount++;
-        }
+    for (var i = 0; i < strongConsensus.length; i++) {
+        if (text.includes(strongConsensus[i])) return true;
     }
     
-    return agreementCount >= 2; // If multiple agreement indicators found
+    var agreesCount = 0;
+    if (responses.gpt4.toLowerCase().includes('i agree') || responses.gpt4.toLowerCase().includes('i concur')) agreesCount++;
+    if (responses.claude.toLowerCase().includes('i agree') || responses.claude.toLowerCase().includes('i concur')) agreesCount++;
+    if (responses.gemini.toLowerCase().includes('i agree') || responses.gemini.toLowerCase().includes('i concur')) agreesCount++;
+    
+    return agreesCount >= 3;
 }
 
 function continueDebate() {
@@ -770,7 +560,6 @@ function finishDebate() {
     document.getElementById('debateArena').style.display = 'none';
     document.getElementById('finalResult').style.display = 'block';
     
-    // Generate consensus summary
     var container = document.getElementById('consensusContainer');
     var html = '<div class="mb-6">';
     html += '<h3 class="text-lg font-bold mb-4">🤝 Debate Conclusion after ' + debateHistory.length + ' rounds</h3>';
@@ -791,10 +580,10 @@ function finishDebate() {
         
         html += '<div class="mt-6 p-4 bg-yellow-50 border-l-4 border-yellow-400 rounded">';
         html += '<h4 class="font-bold mb-2">📋 Debate Summary</h4>';
-        html += '<p class="text-sm">The three AI systems engaged in ' + debateHistory.length + ' rounds of iterative debate, ';
+        html += '<p class="text-sm">The three AI systems engaged in ' + debateHistory.length + ' rounds of iterative debate with rotating devil\'s advocate challenges, ';
         
         if (checkForConsensus(lastRound.responses)) {
-            html += 'reaching a natural consensus on the topic.</p>';
+            html += 'ultimately reaching a natural consensus.</p>';
         } else {
             html += 'exploring different perspectives and finding areas of agreement.</p>';
         }
@@ -806,42 +595,39 @@ function finishDebate() {
 }
 
 function resetDebate() {
-    // Reset all displays
     document.getElementById('finalResult').style.display = 'none';
     document.getElementById('debateArena').style.display = 'none';
     document.getElementById('topicSetup').style.display = 'block';
     
-    // Clear inputs and containers
     document.getElementById('topicInput').value = '';
     document.getElementById('debateFlow').innerHTML = '';
     document.getElementById('consensusContainer').innerHTML = '';
     
-    // Reset buttons
     document.getElementById('continueBtn').style.display = 'none';
     document.getElementById('finishBtn').style.display = 'none';
     
-    // Reset variables
     currentRound = 1;
     debateHistory = [];
     isDebating = false;
+    devilsAdvocate = null;
     
-    // Reset status displays
     document.getElementById('status1').textContent = 'Ready';
     document.getElementById('status2').textContent = 'Ready';
     document.getElementById('status3').textContent = 'Ready';
     document.getElementById('roundCounter').textContent = '1';
+    
+    document.getElementById('role1').style.display = 'none';
+    document.getElementById('role2').style.display = 'none';
+    document.getElementById('role3').style.display = 'none';
 }
 
 function goHome() {
-    // Stop any ongoing debate
     isDebating = false;
     
-    // Show API setup if no keys are saved, otherwise show topic setup
     if (!isDemoMode && !apiKeys.openai && !apiKeys.anthropic && !apiKeys.gemini) {
         document.getElementById('apiSetup').style.display = 'block';
         document.getElementById('mainApp').style.display = 'none';
     } else {
-        // Reset to topic selection
         resetDebate();
     }
 }
