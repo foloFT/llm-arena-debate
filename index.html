@@ -173,7 +173,7 @@ var convergenceScore = 0;
 
 console.log('✅ Global variables initialized');
 
-// Demo collaboration with more rounds and natural evolution
+// Extended demo collaboration that can continue beyond 5 rounds
 var demoCollaboration = [
     // Round 1: Initial perspectives
     {
@@ -199,13 +199,138 @@ var demoCollaboration = [
         claude: "This integration is getting exciting! What if we add ethical checkpoints at each iteration? Not as barriers, but as enhancement points where we ask: 'How does this serve human flourishing?' GPT's learning cycles + Gemini's co-creation + ethical enhancement at every step. We're designing for both effectiveness and wisdom.",
         gemini: "I'm having a breakthrough moment here. What we've collectively designed is a 'wisdom-generating system' - it doesn't just solve problems, it makes everyone involved smarter and more capable. The solution teaches people how to solve similar problems themselves. That's transformational, not just transactional."
     },
-    // Round 5: Final convergence
+    // Round 5: Strong convergence
     {
         gpt4: "We've created something remarkable together. A system that implements wisely, learns continuously, and builds collective capacity. The practical steps are clear: start with stakeholder mapping, design safe-to-fail experiments, build in feedback loops, and scale what works. But more importantly, we've designed for long-term capability building.",
         claude: "I feel we've reached a beautiful synthesis. The solution honors both pragmatic needs and deeper values. It's implementable but not rigid, systematic but not mechanical, innovative but not reckless. What gives me confidence is that this approach can handle uncertainty because it's designed to learn and adapt ethically.",
         gemini: "This collaboration has been generative in the best sense. We started with individual perspectives and created something none of us could have imagined alone. The solution we've designed embodies the same collaborative principles we used to create it. That feels like the right answer - not just what to do, but how to be."
+    },
+    // Round 6: Continuing if needed
+    {
+        gpt4: "Let me add some specificity to our framework. For the implementation phase, I suggest a 3-month pilot with weekly check-ins, monthly stakeholder surveys, and quarterly comprehensive reviews. We need concrete milestones to track both progress and learning.",
+        claude: "Those timelines work well, but I want to ensure we're measuring the right things. Beyond efficiency metrics, we should track stakeholder wellbeing, system resilience, and unintended effects. The ethical checkpoints I mentioned could happen at each of GPT's milestone reviews.",
+        gemini: "What if we prototype this approach on a smaller scale first? Test our collaborative problem-solving framework on a related but simpler challenge, then apply what we learn to the main question. This meta-approach - using our method to improve our method - could be powerful."
+    },
+    // Round 7: Detail refinement
+    {
+        gpt4: "Gemini's meta-approach is smart. We could use a 2-week mini-pilot to test our stakeholder mapping and feedback processes. This would help us refine our approach before committing to the full 3-month implementation. It's like a pilot for our pilot.",
+        claude: "I like this iterative refinement. The mini-pilot could also help us identify which stakeholders are most crucial to involve early. Sometimes the most important voices aren't obvious at first, and this preliminary phase could surface those perspectives.",
+        gemini: "This is becoming beautifully recursive - our solution process is modeling the adaptive, learning-based approach we're recommending. We're essentially creating a living example of how collaborative intelligence can tackle complex challenges."
     }
 ];
+
+// Function to analyze conversation for natural conclusion
+function analyzeForNaturalConclusion(collaborationHistory) {
+    if (collaborationHistory.length < 3) {
+        return { shouldStop: false, reason: "Too early to conclude" };
+    }
+    
+    var lastRound = collaborationHistory[collaborationHistory.length - 1];
+    var allResponses = lastRound.responses.gpt4 + " " + lastRound.responses.claude + " " + lastRound.responses.gemini;
+    var responsesLower = allResponses.toLowerCase();
+    
+    // Check for strong convergence signals
+    var strongConsensusWords = [
+        'we\'ve reached', 'we have reached', 'beautiful synthesis', 'remarkable together',
+        'feels like the right answer', 'this feels complete', 'we\'ve created something',
+        'perfect synthesis', 'complete solution', 'comprehensive approach'
+    ];
+    
+    for (var i = 0; i < strongConsensusWords.length; i++) {
+        if (responsesLower.includes(strongConsensusWords[i])) {
+            return { 
+                shouldStop: true, 
+                reason: "Strong consensus detected: '" + strongConsensusWords[i] + "'" 
+            };
+        }
+    }
+    
+    // Check for solution completeness signals
+    var completenessWords = [
+        'steps are clear', 'framework is complete', 'have our answer', 'solution is ready',
+        'practical steps', 'clear implementation', 'ready to implement', 'approach is solid'
+    ];
+    
+    var completenessCount = 0;
+    for (var i = 0; i < completenessWords.length; i++) {
+        if (responsesLower.includes(completenessWords[i])) {
+            completenessCount++;
+        }
+    }
+    
+    if (completenessCount >= 2) {
+        return { 
+            shouldStop: true, 
+            reason: "Solution completeness achieved" 
+        };
+    }
+    
+    // Check if all three AIs are building on the same framework
+    var buildingWords = ['building on', 'builds on', 'add to', 'expanding', 'extending'];
+    var integrationWords = ['integrate', 'combine', 'together', 'synthesis', 'merge'];
+    
+    var buildingCount = 0;
+    var integrationCount = 0;
+    
+    for (var i = 0; i < buildingWords.length; i++) {
+        if (responsesLower.includes(buildingWords[i])) buildingCount++;
+    }
+    
+    for (var i = 0; i < integrationWords.length; i++) {
+        if (responsesLower.includes(integrationWords[i])) integrationCount++;
+    }
+    
+    if (buildingCount >= 2 && integrationCount >= 1 && collaborationHistory.length >= 4) {
+        return { 
+            shouldStop: true, 
+            reason: "Ideas are converging into integrated solution" 
+        };
+    }
+    
+    // Check if they're getting repetitive (sign of exhaustion)
+    if (collaborationHistory.length >= 2) {
+        var currentRound = lastRound.responses;
+        var previousRound = collaborationHistory[collaborationHistory.length - 2].responses;
+        
+        var similarity = calculateSimilarity(currentRound, previousRound);
+        if (similarity > 0.7 && collaborationHistory.length >= 5) {
+            return { 
+                shouldStop: true, 
+                reason: "Conversation becoming repetitive - ideas have converged" 
+            };
+        }
+    }
+    
+    // Hard limit to prevent infinite loops
+    if (collaborationHistory.length >= 10) {
+        return { 
+            shouldStop: true, 
+            reason: "Maximum exploration reached - time to synthesize" 
+        };
+    }
+    
+    return { shouldStop: false, reason: "Continue collaboration" };
+}
+
+// Simple similarity calculator
+function calculateSimilarity(current, previous) {
+    var currentText = (current.gpt4 + " " + current.claude + " " + current.gemini).toLowerCase();
+    var previousText = (previous.gpt4 + " " + previous.claude + " " + previous.gemini).toLowerCase();
+    
+    var currentWords = currentText.split(' ');
+    var previousWords = previousText.split(' ');
+    
+    var commonWords = 0;
+    var totalWords = currentWords.length;
+    
+    for (var i = 0; i < currentWords.length; i++) {
+        if (previousWords.indexOf(currentWords[i]) !== -1) {
+            commonWords++;
+        }
+    }
+    
+    return commonWords / totalWords;
+}
 
 console.log('✅ Demo collaboration data loaded');
 
