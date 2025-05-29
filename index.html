@@ -1,4 +1,146 @@
-<!DOCTYPE html>
+function updateDevilsAdvocateDisplay() {
+    // Reset all role displays
+    document.getElementById('role1').style.display = 'none';
+    document.getElementById('role2').style.display = 'none';
+    document.getElementById('role3').style.display = 'none';
+    
+    // Show devil's advocate badge
+    if (devilsAdvocate === 'gpt4') {
+        var roleEl = document.getElementById('role1');
+        roleEl.textContent = '😈 Devil\'s Advocate';
+        roleEl.className = 'ml-2 text-xs px-2 py-1 rounded bg-red-100 text-red-800';
+        roleEl.style.display = 'inline';
+    } else if (devilsAdvocate === 'claude') {
+        var roleEl = document.getElementById('role2');
+        roleEl.textContent = '😈 Devil\'s Advocate';
+        roleEl.className = 'ml-2 text-xs px-2 py-1 rounded bg-red-100 text-red-800';
+        roleEl.style.display = 'inline';
+    } else if (devilsAdvocate === 'gemini') {
+        var roleEl = document.getElementById('role3');
+        roleEl.textContent = '😈 Devil\'s Advocate';
+        roleEl.className = 'ml-2 text-xs px-2 py-1 rounded bg-red-100 text-red-800';
+        roleEl.style.display = 'inline';
+    }
+}
+
+function displayRound(responses) {
+    var container = document.getElementById('debateFlow');
+    var roundDiv = document.createElement('div');
+    roundDiv.className = 'ml-12 relative';
+    
+    var html = '<div class="absolute -left-14 top-2 w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center text-sm font-bold">' + currentRound + '</div>';
+    html += '<div class="space-y-4">';
+    
+    // GPT-4
+    var gpt4Class = devilsAdvocate === 'gpt4' ? 'bg-red-50 border-red-200' : 'bg-blue-50 border-blue-200';
+    html += '<div class="' + gpt4Class + ' border rounded-lg p-4">';
+    html += '<div class="flex items-center mb-2">';
+    html += '<div class="w-3 h-3 bg-blue-500 rounded-full mr-2"></div>';
+    html += '<span class="font-medium text-blue-900">GPT-4</span>';
+    if (devilsAdvocate === 'gpt4') {
+        html += '<span class="ml-2 text-xs px-2 py-1 rounded bg-red-100 text-red-800">😈 Devil\'s Advocate</span>';
+    }
+    html += '</div>';
+    html += '<p class="text-gray-700">' + responses.gpt4 + '</p>';
+    html += '</div>';
+    
+    // Claude
+    var claudeClass = devilsAdvocate === 'claude' ? 'bg-red-50 border-red-200' : 'bg-purple-50 border-purple-200';
+    html += '<div class="' + claudeClass + ' border rounded-lg p-4">';
+    html += '<div class="flex items-center mb-2">';
+    html += '<div class="w-3 h-3 bg-purple-500 rounded-full mr-2"></div>';
+    html += '<span class="font-medium text-purple-900">Claude</span>';
+    if (devilsAdvocate === 'claude') {
+        html += '<span class="ml-2 text-xs px-2 py-1 rounded bg-red-100 text-red-800">😈 Devil\'s Advocate</span>';
+    }
+    html += '</div>';
+    html += '<p class="text-gray-700">' + responses.claude + '</p>';
+    html += '</div>';
+    
+    // Gemini
+    var geminiClass = devilsAdvocate === 'gemini' ? 'bg-red-50 border-red-200' : 'bg-green-50 border-green-200';
+    html += '<div class="' + geminiClass + ' border rounded-lg p-4">';
+    html += '<div class="flex items-center mb-2">';
+    html += '<div class="w-3 h-3 bg-green-500 rounded-full mr-2"></div>';
+    html += '<span class="font-medium text-green-900">Gemini</span>';
+    if (devilsAdvocate === 'gemini') {
+        html += '<span class="ml-2 text-xs px-2 py-1 rounded bg-red-100 text-red-800">😈 Devil\'s Advocate</span>';
+    }
+    html += '</div>';
+    html += '<p class="text-gray-700">' + responses.gemini + '</p>';
+    html += '</div>';
+    
+    html += '</div>';
+    roundDiv.innerHTML = html;
+    
+    container.appendChild(roundDiv);
+    
+    // Scroll to bottom
+    roundDiv.scrollIntoView({ behavior: 'smooth' });
+}
+
+function checkForConsensus(responses) {
+    // Stricter consensus detection - require explicit unanimous agreement
+    var text = (responses.gpt4 + " " + responses.claude + " " + responses.gemini).toLowerCase();
+    
+    // Look for strong consensus indicators
+    var strongConsensus = [
+        'we all agree',
+        'unanimous',
+        'full consensus',
+        'complete agreement',
+        'we have reached consensus',
+        'all three of us agree',
+        'we are in full agreement'
+    ];
+    
+    for (var i = 0; i < strongConsensus.length; i++) {
+        if (text.includes(strongConsensus[i])) {
+            return true;
+        }
+    }
+    
+    // Also check if all three explicitly state agreement
+    var agreesCount = 0;
+    if (responses.gpt4.toLowerCase().includes('i agree') || responses.gpt4.toLowerCase().includes('i concur')) agreesCount++;
+    if (responses.claude.toLowerCase().includes('i agree') || responses.claude.toLowerCase().includes('i concur')) agreesCount++;
+    if (responses.gemini.toLowerCase().includes('i agree') || responses.gemini.toLowerCase().includes('i concur')) agreesCount++;
+    
+    return agreesCount >= 3; // All three must explicitly agree
+}
+
+function resetDebate() {
+    // Reset all displays
+    document.getElementById('finalResult').style.display = 'none';
+    document.getElementById('debateArena').style.display = 'none';
+    document.getElementById('topicSetup').style.display = 'block';
+    
+    // Clear inputs and containers
+    document.getElementById('topicInput').value = '';
+    document.getElementById('debateFlow').innerHTML = '';
+    document.getElementById('consensusContainer').innerHTML = '';
+    
+    // Reset buttons
+    document.getElementById('continueBtn').style.display = 'none';
+    document.getElementById('finishBtn').style.display = 'none';
+    
+    // Reset variables
+    currentRound = 1;
+    debateHistory = [];
+    isDebating = false;
+    devilsAdvocate = null;
+    
+    // Reset status displays
+    document.getElementById('status1').textContent = 'Ready';
+    document.getElementById('status2').textContent = 'Ready';
+    document.getElementById('status3').textContent = 'Ready';
+    document.getElementById('roundCounter').textContent = '1';
+    
+    // Reset role displays
+    document.getElementById('role1').style.display = 'none';
+    document.getElementById('role2').style.display = 'none';
+    document.getElementById('role3').style.display = 'none';
+}<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -120,24 +262,27 @@
 
                 <!-- Debate Status -->
                 <div class="grid md:grid-cols-4 gap-4 mb-6">
-                    <div class="bg-white p-4 rounded-lg shadow border-l-4 border-blue-500">
+                    <div id="modelCard1" class="bg-white p-4 rounded-lg shadow border-l-4 border-blue-500">
                         <div class="flex items-center mb-2">
                             <div class="w-3 h-3 bg-blue-500 rounded-full mr-2"></div>
                             <span class="font-medium">GPT-4</span>
+                            <span id="role1" class="ml-2 text-xs px-2 py-1 rounded" style="display: none;"></span>
                         </div>
                         <div id="status1" class="text-xs text-gray-400">Ready</div>
                     </div>
-                    <div class="bg-white p-4 rounded-lg shadow border-l-4 border-purple-500">
+                    <div id="modelCard2" class="bg-white p-4 rounded-lg shadow border-l-4 border-purple-500">
                         <div class="flex items-center mb-2">
                             <div class="w-3 h-3 bg-purple-500 rounded-full mr-2"></div>
                             <span class="font-medium">Claude</span>
+                            <span id="role2" class="ml-2 text-xs px-2 py-1 rounded" style="display: none;"></span>
                         </div>
                         <div id="status2" class="text-xs text-gray-400">Ready</div>
                     </div>
-                    <div class="bg-white p-4 rounded-lg shadow border-l-4 border-green-500">
+                    <div id="modelCard3" class="bg-white p-4 rounded-lg shadow border-l-4 border-green-500">
                         <div class="flex items-center mb-2">
                             <div class="w-3 h-3 bg-green-500 rounded-full mr-2"></div>
                             <span class="font-medium">Gemini</span>
+                            <span id="role3" class="ml-2 text-xs px-2 py-1 rounded" style="display: none;"></span>
                         </div>
                         <div id="status3" class="text-xs text-gray-400">Ready</div>
                     </div>
@@ -183,6 +328,8 @@ var maxRounds = 10;
 var debateHistory = [];
 var isDemoMode = false;
 var isDebating = false;
+var devilsAdvocate = null; // Which AI is playing devil's advocate this round
+var minRoundsBeforeConsensus = 5; // Minimum rounds before allowing consensus
 
 // Demo responses that build on each other
 var demoConversation = [
@@ -204,20 +351,22 @@ var demoConversation = [
 ];
 
 // API call functions
-async function callOpenAI(prompt, context) {
+async function callOpenAI(prompt, context, isDevilsAdvocate) {
     if (!apiKeys.openai) {
         throw new Error('OpenAI API key not provided');
     }
     
     try {
-        var messages = [
-            {
-                role: "system", 
-                content: currentRound === 1 ? 
-                    "You are participating in a respectful debate with other AI systems. Give your initial thoughtful perspective on this topic in 2-3 sentences." :
-                    "You are participating in a respectful debate. Read the previous round carefully and respond to the other AIs' points. You can agree, disagree, or build on their ideas. Keep responses to 2-3 sentences."
-            }
-        ];
+        var systemPrompt;
+        if (currentRound === 1) {
+            systemPrompt = "You are participating in a respectful debate with other AI systems. Give your initial thoughtful perspective on this topic in 3-4 sentences.";
+        } else if (isDevilsAdvocate) {
+            systemPrompt = "You are the DEVIL'S ADVOCATE in this debate round. Your job is to challenge the emerging consensus, find flaws in the other AIs' arguments, and present counterarguments. Be respectful but assertive in pointing out problems or alternative perspectives. Use 3-4 sentences.";
+        } else {
+            systemPrompt = "You are participating in a respectful debate. Read the previous round carefully and respond to the other AIs' points. You can agree, disagree, or build on their ideas. Use 3-4 sentences.";
+        }
+        
+        var messages = [{ role: "system", content: systemPrompt }];
         
         if (context && currentRound > 1) {
             messages.push({role: "user", content: "Previous debate round:\n" + context + "\n\nNow respond to their points:"});
@@ -234,8 +383,8 @@ async function callOpenAI(prompt, context) {
             body: JSON.stringify({
                 model: "gpt-4",
                 messages: messages,
-                max_tokens: 150,
-                temperature: 0.7
+                max_tokens: 200,
+                temperature: 0.8
             })
         });
         
@@ -251,15 +400,20 @@ async function callOpenAI(prompt, context) {
     }
 }
 
-async function callAnthropic(prompt, context) {
+async function callAnthropic(prompt, context, isDevilsAdvocate) {
     if (!apiKeys.anthropic) {
         throw new Error('Anthropic API key not provided');
     }
     
     try {
-        var fullPrompt = currentRound === 1 ?
-            "Give your thoughtful perspective on this topic in 2-3 sentences: " + prompt :
-            "Previous debate round:\n" + context + "\n\nTopic: " + prompt + "\n\nPlease respond to the other AIs' points from the previous round. You can agree, disagree, or build on their ideas. Keep your response to 2-3 sentences.";
+        var fullPrompt;
+        if (currentRound === 1) {
+            fullPrompt = "Give your thoughtful perspective on this topic in 3-4 sentences: " + prompt;
+        } else if (isDevilsAdvocate) {
+            fullPrompt = "You are the DEVIL'S ADVOCATE this round. Previous debate round:\n" + context + "\n\nTopic: " + prompt + "\n\nYour job is to challenge the emerging consensus and find flaws in the other AIs' arguments. Be respectful but assertive in presenting counterarguments or alternative perspectives. Use 3-4 sentences.";
+        } else {
+            fullPrompt = "Previous debate round:\n" + context + "\n\nTopic: " + prompt + "\n\nPlease respond to the other AIs' points from the previous round. You can agree, disagree, or build on their ideas. Use 3-4 sentences.";
+        }
         
         var response = await fetch('https://api.anthropic.com/v1/messages', {
             method: 'POST',
@@ -270,7 +424,7 @@ async function callAnthropic(prompt, context) {
             },
             body: JSON.stringify({
                 model: "claude-3-sonnet-20240229",
-                max_tokens: 150,
+                max_tokens: 200,
                 messages: [
                     {
                         role: "user",
@@ -292,15 +446,20 @@ async function callAnthropic(prompt, context) {
     }
 }
 
-async function callGemini(prompt, context) {
+async function callGemini(prompt, context, isDevilsAdvocate) {
     if (!apiKeys.gemini) {
         throw new Error('Gemini API key not provided');
     }
     
     try {
-        var fullPrompt = currentRound === 1 ?
-            "Give your thoughtful perspective on this topic in 2-3 sentences: " + prompt :
-            "Previous debate round:\n" + context + "\n\nTopic: " + prompt + "\n\nPlease respond to the other AIs' points from the previous round. You can agree, disagree, or build on their ideas. Help find common ground where possible. Keep your response to 2-3 sentences.";
+        var fullPrompt;
+        if (currentRound === 1) {
+            fullPrompt = "Give your thoughtful perspective on this topic in 3-4 sentences: " + prompt;
+        } else if (isDevilsAdvocate) {
+            fullPrompt = "You are the DEVIL'S ADVOCATE this round. Previous debate round:\n" + context + "\n\nTopic: " + prompt + "\n\nYour job is to challenge the emerging consensus and find flaws in the other AIs' arguments. Be respectful but assertive in presenting counterarguments. Use 3-4 sentences.";
+        } else {
+            fullPrompt = "Previous debate round:\n" + context + "\n\nTopic: " + prompt + "\n\nPlease respond to the other AIs' points from the previous round. You can agree, disagree, or build on their ideas. Help find common ground where possible but don't be afraid to disagree. Use 3-4 sentences.";
+        }
         
         var response = await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=' + apiKeys.gemini, {
             method: 'POST',
@@ -314,8 +473,8 @@ async function callGemini(prompt, context) {
                     }]
                 }],
                 generationConfig: {
-                    temperature: 0.7,
-                    maxOutputTokens: 150
+                    temperature: 0.8,
+                    maxOutputTokens: 200
                 }
             })
         });
@@ -381,6 +540,13 @@ async function generateRound() {
         return;
     }
     
+    // Assign Devil's Advocate for rounds 2+ (rotate between models)
+    if (currentRound > 1) {
+        var models = ['gpt4', 'claude', 'gemini'];
+        devilsAdvocate = models[(currentRound - 2) % 3]; // Rotates each round
+        updateDevilsAdvocateDisplay();
+    }
+    
     // Update round counter
     document.getElementById('roundCounter').textContent = currentRound;
     
@@ -408,12 +574,12 @@ async function generateRound() {
                 gemini: demoConversation[demoIndex].gemini
             };
         } else {
-            // Make API calls - simultaneous for Round 1, then responding to previous rounds
+            // Make API calls with Devil's Advocate prompting
             var promises = [];
             
             if (apiKeys.openai) {
                 promises.push(
-                    callOpenAI(topic, context).then(function(result) {
+                    callOpenAI(topic, context, devilsAdvocate === 'gpt4').then(function(result) {
                         responses.gpt4 = result;
                         document.getElementById('status1').textContent = 'Complete';
                     }).catch(function(error) {
@@ -431,7 +597,7 @@ async function generateRound() {
             
             if (apiKeys.anthropic) {
                 promises.push(
-                    callAnthropic(topic, context).then(function(result) {
+                    callAnthropic(topic, context, devilsAdvocate === 'claude').then(function(result) {
                         responses.claude = result;
                         document.getElementById('status2').textContent = 'Complete';
                     }).catch(function(error) {
@@ -449,7 +615,7 @@ async function generateRound() {
             
             if (apiKeys.gemini) {
                 promises.push(
-                    callGemini(topic, context).then(function(result) {
+                    callGemini(topic, context, devilsAdvocate === 'gemini').then(function(result) {
                         responses.gemini = result;
                         document.getElementById('status3').textContent = 'Complete';
                     }).catch(function(error) {
@@ -474,7 +640,8 @@ async function generateRound() {
         // Add to debate history
         debateHistory.push({
             round: currentRound,
-            responses: responses
+            responses: responses,
+            devilsAdvocate: devilsAdvocate
         });
         
         // Display the round
@@ -487,8 +654,8 @@ async function generateRound() {
             document.getElementById('status3').textContent = 'Demo Complete';
         }
         
-        // Check for consensus or continue
-        if (checkForConsensus(responses) || currentRound >= maxRounds) {
+        // Check for consensus (only after minimum rounds)
+        if (currentRound >= minRoundsBeforeConsensus && (checkForConsensus(responses) || currentRound >= maxRounds)) {
             finishDebate();
         } else {
             currentRound++;
@@ -509,7 +676,8 @@ async function generateRound() {
         
         debateHistory.push({
             round: currentRound,
-            responses: responses
+            responses: responses,
+            devilsAdvocate: devilsAdvocate
         });
         
         displayRound(responses);
