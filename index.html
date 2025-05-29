@@ -37,7 +37,10 @@
 
     <div class="gradient-bg text-white p-6 shadow-lg">
         <div class="max-w-6xl mx-auto">
-            <h1 class="text-3xl font-bold mb-2">🤖 AI Iterative Debate</h1>
+            <h1 class="text-3xl font-bold mb-2">
+                <span onclick="goHome()" class="cursor-pointer hover:text-blue-200 transition-colors" title="Return to Home">🤖</span> 
+                AI Iterative Debate
+            </h1>
             <p class="text-blue-100">GPT-4, Claude & Gemini debate until they reach consensus</p>
         </div>
     </div>
@@ -514,14 +517,14 @@ async function generateRound() {
 }
 
 function buildContext() {
-    var context = "";
-    for (var i = 0; i < debateHistory.length; i++) {
-        var round = debateHistory[i];
-        context += "Round " + round.round + ":\n";
-        context += "GPT-4: " + round.responses.gpt4 + "\n";
-        context += "Claude: " + round.responses.claude + "\n";
-        context += "Gemini: " + round.responses.gemini + "\n\n";
-    }
+    if (debateHistory.length === 0) return "";
+    
+    // Only use the most recent round for context (not all rounds)
+    var lastRound = debateHistory[debateHistory.length - 1];
+    var context = "Previous Round " + lastRound.round + ":\n";
+    context += "GPT-4: " + lastRound.responses.gpt4 + "\n";
+    context += "Claude: " + lastRound.responses.claude + "\n";
+    context += "Gemini: " + lastRound.responses.gemini;
     return context;
 }
 
@@ -659,6 +662,20 @@ function resetDebate() {
     document.getElementById('status2').textContent = 'Ready';
     document.getElementById('status3').textContent = 'Ready';
     document.getElementById('roundCounter').textContent = '1';
+}
+
+function goHome() {
+    // Stop any ongoing debate
+    isDebating = false;
+    
+    // Show API setup if no keys are saved, otherwise show topic setup
+    if (!isDemoMode && !apiKeys.openai && !apiKeys.anthropic && !apiKeys.gemini) {
+        document.getElementById('apiSetup').style.display = 'block';
+        document.getElementById('mainApp').style.display = 'none';
+    } else {
+        // Reset to topic selection
+        resetDebate();
+    }
 }
 </script>
 
