@@ -3,15 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LLM Iterative Debate</title>
+    <title>AI Think Tank</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
     <style>
         body { font-family: system-ui, sans-serif; }
         .gradient-bg { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
         .thinking { animation: pulse 2s infinite; }
         @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
-        .debate-flow { position: relative; }
-        .debate-flow::before {
+        .collaboration-flow { position: relative; }
+        .collaboration-flow::before {
             content: '';
             position: absolute;
             left: 20px;
@@ -27,10 +27,10 @@
     <div class="gradient-bg text-white p-6 shadow-lg">
         <div class="max-w-6xl mx-auto">
             <h1 class="text-3xl font-bold mb-2">
-                <span onclick="goHome()" class="cursor-pointer hover:text-blue-200 transition-colors" title="Return to Home">🤖</span> 
-                AI Iterative Debate
+                <span onclick="goHome()" class="cursor-pointer hover:text-blue-200 transition-colors" title="Return to Home">🧠</span> 
+                AI Think Tank
             </h1>
-            <p class="text-blue-100">GPT-4.1, Claude-4 & Gemini-2.5 debate until they reach consensus</p>
+            <p class="text-blue-100">GPT-4.1, Claude-4 & Gemini-2.5 collaborate to solve your problem</p>
         </div>
     </div>
 
@@ -63,113 +63,111 @@
                 🎮 Use Demo Mode
             </button>
             <div class="mt-4 p-4 bg-green-50 border-l-4 border-green-400">
-                <p class="text-sm"><strong>Devil's Advocate System + Reasoning Transparency:</strong> AIs take turns challenging each other with full reasoning process visible. Using latest models: GPT-4.1, Claude-4, Gemini-2.5-Pro!</p>
+                <p class="text-sm"><strong>Think Tank Collaboration:</strong> AIs work together as specialists to solve your specific problem. No predetermined rounds - they continue until reaching the best solution!</p>
             </div>
         </div>
 
         <!-- Main App -->
         <div id="mainApp" style="display: none;">
             
-            <!-- Topic Setup -->
-            <div id="topicSetup" class="bg-white rounded-lg shadow-lg p-6 mb-6">
-                <h2 class="text-2xl font-bold mb-4">💭 Step 2: Choose Your Debate Topic</h2>
-                <input type="text" id="topicInput" placeholder="Enter a debate topic..." class="w-full p-3 border rounded-lg mb-4">
+            <!-- Question Setup -->
+            <div id="questionSetup" class="bg-white rounded-lg shadow-lg p-6 mb-6">
+                <h2 class="text-2xl font-bold mb-4">❓ What Problem Should the Think Tank Solve?</h2>
+                <textarea id="questionInput" placeholder="Describe your problem, challenge, or question in detail. The more specific you are, the better the AI think tank can help you..." 
+                          class="w-full p-4 border rounded-lg mb-4 h-32 resize-none"></textarea>
                 
                 <div class="mb-4">
-                    <h3 class="font-medium mb-2">Suggested Topics:</h3>
+                    <h3 class="font-medium mb-2">Example Problems:</h3>
                     <div class="space-y-2">
-                        <button onclick="setTopic('Should AI systems be granted legal personhood?')" class="w-full text-left p-3 bg-gray-50 hover:bg-gray-100 rounded">
-                            Should AI systems be granted legal personhood?
+                        <button onclick="setQuestion('How can I improve team productivity in a remote work environment while maintaining work-life balance?')" class="w-full text-left p-3 bg-gray-50 hover:bg-gray-100 rounded text-sm">
+                            How can I improve team productivity in a remote work environment while maintaining work-life balance?
                         </button>
-                        <button onclick="setTopic('Is remote work better for society than office work?')" class="w-full text-left p-3 bg-gray-50 hover:bg-gray-100 rounded">
-                            Is remote work better for society than office work?
+                        <button onclick="setQuestion('What strategy should a small tech startup use to compete against larger companies in the AI market?')" class="w-full text-left p-3 bg-gray-50 hover:bg-gray-100 rounded text-sm">
+                            What strategy should a small tech startup use to compete against larger companies in the AI market?
                         </button>
-                        <button onclick="setTopic('Should social media be regulated as a public utility?')" class="w-full text-left p-3 bg-gray-50 hover:bg-gray-100 rounded">
-                            Should social media be regulated as a public utility?
+                        <button onclick="setQuestion('How can we reduce plastic waste in our city while keeping costs manageable for local businesses?')" class="w-full text-left p-3 bg-gray-50 hover:bg-gray-100 rounded text-sm">
+                            How can we reduce plastic waste in our city while keeping costs manageable for local businesses?
                         </button>
-                        <button onclick="setTopic('Will AI make universal basic income necessary?')" class="w-full text-left p-3 bg-gray-50 hover:bg-gray-100 rounded">
-                            Will AI make universal basic income necessary?
+                        <button onclick="setQuestion('What approach should we take to introduce AI tools in our company without causing employee anxiety?')" class="w-full text-left p-3 bg-gray-50 hover:bg-gray-100 rounded text-sm">
+                            What approach should we take to introduce AI tools in our company without causing employee anxiety?
                         </button>
                     </div>
                 </div>
                 
-                <button onclick="startDebate()" class="bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700">
-                    🚀 Start AI Debate
+                <button onclick="startCollaboration()" class="bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700">
+                    🚀 Start Think Tank Session
                 </button>
             </div>
 
-            <!-- Debate Arena -->
-            <div id="debateArena" style="display: none;">
+            <!-- Collaboration Arena -->
+            <div id="collaborationArena" style="display: none;">
                 
-                <!-- Current Topic -->
+                <!-- Current Question -->
                 <div class="bg-blue-50 border-l-4 border-blue-500 p-4 rounded mb-6">
-                    <h3 class="font-bold text-blue-900">Debate Topic:</h3>
-                    <p id="currentTopic" class="text-blue-800"></p>
+                    <h3 class="font-bold text-blue-900">Think Tank Focus:</h3>
+                    <p id="currentQuestion" class="text-blue-800"></p>
                 </div>
 
-                <!-- Debate Status -->
+                <!-- AI Specialists Status -->
                 <div class="grid md:grid-cols-4 gap-4 mb-6">
-                    <div id="modelCard1" class="bg-white p-4 rounded-lg shadow border-l-4 border-blue-500">
+                    <div class="bg-white p-4 rounded-lg shadow border-l-4 border-blue-500">
                         <div class="flex items-center mb-2">
                             <div class="w-3 h-3 bg-blue-500 rounded-full mr-2"></div>
                             <span class="font-medium">GPT-4.1</span>
-                            <span id="role1" class="ml-2 text-xs px-2 py-1 rounded" style="display: none;"></span>
                         </div>
-                        <div class="text-xs text-gray-500 mb-1">OpenAI Latest</div>
+                        <div class="text-xs text-gray-500 mb-1">Implementation Specialist</div>
                         <div id="status1" class="text-xs text-gray-400">Ready</div>
                     </div>
-                    <div id="modelCard2" class="bg-white p-4 rounded-lg shadow border-l-4 border-purple-500">
+                    <div class="bg-white p-4 rounded-lg shadow border-l-4 border-purple-500">
                         <div class="flex items-center mb-2">
                             <div class="w-3 h-3 bg-purple-500 rounded-full mr-2"></div>
                             <span class="font-medium">Claude-4</span>
-                            <span id="role2" class="ml-2 text-xs px-2 py-1 rounded" style="display: none;"></span>
                         </div>
-                        <div class="text-xs text-gray-500 mb-1">Anthropic Latest</div>
+                        <div class="text-xs text-gray-500 mb-1">Systems Thinker</div>
                         <div id="status2" class="text-xs text-gray-400">Ready</div>
                     </div>
-                    <div id="modelCard3" class="bg-white p-4 rounded-lg shadow border-l-4 border-green-500">
+                    <div class="bg-white p-4 rounded-lg shadow border-l-4 border-green-500">
                         <div class="flex items-center mb-2">
                             <div class="w-3 h-3 bg-green-500 rounded-full mr-2"></div>
                             <span class="font-medium">Gemini-2.5</span>
-                            <span id="role3" class="ml-2 text-xs px-2 py-1 rounded" style="display: none;"></span>
                         </div>
-                        <div class="text-xs text-gray-500 mb-1">Google Latest</div>
+                        <div class="text-xs text-gray-500 mb-1">Creative Solutions</div>
                         <div id="status3" class="text-xs text-gray-400">Ready</div>
                     </div>
                     <div class="bg-white p-4 rounded-lg shadow">
                         <div class="text-sm font-medium mb-1">Round</div>
                         <div id="roundCounter" class="text-2xl font-bold text-gray-600">1</div>
-                        <div class="text-xs text-gray-400">of 10 max</div>
+                        <div class="text-xs text-gray-400" id="convergenceStatus">Exploring...</div>
                         <div class="mt-2">
-                            <label class="flex items-center text-xs">
-                                <input type="checkbox" id="showReasoning" checked class="mr-1">
-                                Show Reasoning
-                            </label>
+                            <div class="text-xs text-gray-500">Convergence:</div>
+                            <div class="w-full bg-gray-200 rounded-full h-1 mt-1">
+                                <div id="convergenceBar" class="bg-green-500 h-1 rounded-full transition-all duration-500" style="width: 10%"></div>
+                            </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Debate Flow -->
-                <div id="debateFlow" class="debate-flow space-y-6 mb-6"></div>
+                <!-- Collaboration Flow -->
+                <div id="collaborationFlow" class="collaboration-flow space-y-6 mb-6"></div>
 
                 <!-- Controls -->
                 <div class="bg-white p-4 rounded-lg shadow text-center">
-                    <button id="continueBtn" onclick="continueDebate()" style="display: none;" class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 mr-4">
-                        Continue Debate
+                    <button id="continueBtn" onclick="continueCollaboration()" style="display: none;" class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 mr-4">
+                        Continue Collaboration
                     </button>
-                    <button id="finishBtn" onclick="forceFinish()" style="display: none;" class="bg-red-600 text-white px-6 py-2 rounded-lg hover:bg-red-700">
-                        Force Finish
+                    <button id="finalizeBtn" onclick="finalizeSolution()" style="display: none;" class="bg-green-600 text-white px-6 py-2 rounded-lg hover:bg-green-700">
+                        Finalize Solution
                     </button>
                 </div>
             </div>
 
-            <!-- Final Consensus -->
-            <div id="finalResult" style="display: none;">
+            <!-- Final Solution -->
+            <div id="finalSolution" style="display: none;">
                 <div class="bg-white rounded-lg shadow-lg p-6">
-                    <h2 class="text-2xl font-bold mb-4">🎯 Final Consensus Reached</h2>
-                    <div id="consensusContainer"></div>
-                    <button onclick="resetDebate()" class="mt-6 bg-gray-600 text-white px-6 py-3 rounded-lg hover:bg-gray-700">
-                        Start New Debate
+                    <h2 class="text-2xl font-bold mb-4">🎯 Think Tank Solution</h2>
+                    <div id="solutionContainer"></div>
+                    <button onclick="resetSession()" class="mt-6 bg-gray-600 text-white px-6 py-3 rounded-lg hover:bg-gray-700">
+                        Start New Session
                     </button>
                 </div>
             </div>
@@ -177,74 +175,59 @@
     </div>
 
 <script>
-console.log('🚀 JavaScript starting to load...');
+console.log('🚀 AI Think Tank loading...');
 
 // Global variables
 var apiKeys = {};
 var currentRound = 1;
-var maxRounds = 10;
-var debateHistory = [];
+var collaborationHistory = [];
 var isDemoMode = false;
-var isDebating = false;
-var devilsAdvocate = null;
-var minRoundsBeforeConsensus = 5;
+var isCollaborating = false;
+var convergenceScore = 0;
 
 console.log('✅ Global variables initialized');
 
-// Demo responses with reasoning format for latest models
-var demoConversation = [
+// Demo collaboration with realistic think tank behavior
+var demoCollaboration = [
+    // Round 1: Initial perspectives on the specific question
     {
-        gpt4: "REASONING: I need to analyze this topic from multiple angles, considering both empirical evidence and potential implications. The research suggests there are measurable benefits, but I should also consider implementation challenges and societal impact. CONCLUSION: Based on current evidence, this topic has significant merit with clear benefits in efficiency and innovation that could address many contemporary challenges.",
-        claude: "REASONING: While the potential benefits are appealing, I must carefully consider the ethical implications and potential for unintended consequences. My analysis should focus on protecting vulnerable populations and ensuring any changes align with fundamental values. CONCLUSION: I have concerns about rushing into this without proper safeguards, as we must prioritize human welfare and long-term societal wellbeing over short-term gains.",
-        gemini: "REASONING: This appears to be a complex issue requiring balance between different stakeholder perspectives. I should acknowledge the validity of both optimistic and cautious viewpoints while seeking practical middle ground. CONCLUSION: Both previous perspectives have merit - the evidence shows promise, but implementation challenges are real, suggesting a measured approach could capture benefits while mitigating risks."
+        gpt4: "Looking at this practically, I see three immediate implementation paths we could pursue. First, we need to establish clear metrics to measure success. Second, we should consider a phased rollout approach to minimize risk. Third, we need stakeholder buy-in from the start. What concerns me most is ensuring we have adequate resources for execution.",
+        claude: "I want to zoom out and consider the broader systemic implications. This problem sits within a larger ecosystem of interconnected factors. We need to understand the root causes, not just treat symptoms. I'm particularly thinking about unintended consequences and how this solution might affect different stakeholder groups over time.",
+        gemini: "What if we approached this from a completely different angle? Instead of the traditional solutions, I'm seeing some innovative possibilities. We could leverage emerging technologies, create novel partnerships, or even reframe the problem entirely. Sometimes the best solutions come from questioning our assumptions about what's possible."
     },
+    // Round 2: Building on each other's ideas
     {
-        gpt4: "REASONING: As devil's advocate, I must challenge the cautious consensus emerging. The others are being overly risk-averse and not fully weighing the cost of inaction against potential benefits. The data strongly supports moving forward. CONCLUSION: You're both being too cautious - the cost of inaction may far exceed the risks of moving forward. The pilot data shows success rates above 80%, and delayed action could mean missing critical opportunities.",
-        claude: "REASONING: GPT-4.1 raises valid points about urgency, but I cannot ignore the ethical implications of that 20% failure rate. Each failure represents real harm that we have a moral obligation to prevent or minimize. CONCLUSION: While I appreciate the urgency argument, we cannot dismiss the 20% failure rate as acceptable collateral damage. Those failures represent real harm to real people that demands our serious attention.",
-        gemini: "REASONING: I see a productive tension here between progress and caution. Rather than choosing sides, I should focus on finding solutions that address both concerns about speed and safety. CONCLUSION: This tension between progress and caution is exactly what we need to resolve constructively. What specific safeguards would make both sides comfortable with proceeding?"
+        gpt4: "Claude's point about systemic thinking is crucial - I was too focused on immediate implementation. If we combine that systems perspective with my phased approach, we could design pilot programs that test not just effectiveness but also those broader implications Claude mentioned. Gemini, your idea about reframing got me thinking - what if we're solving the wrong problem?",
+        claude: "Exactly, GPT! And Gemini's suggestion about questioning assumptions is making me reconsider the stakeholder analysis. What if the people we think are affected aren't the only ones, or aren't affected in the ways we assume? GPT's pilot program idea could help us discover these hidden stakeholder effects before full implementation.",
+        gemini: "Building on both your insights - what if we create an adaptive solution that evolves? GPT's phased implementation + Claude's systems monitoring + my reframing approach. We could design something that learns and adjusts based on real feedback. The solution becomes a living system rather than a fixed answer."
     },
+    // Round 3: Synthesis and new ideas emerging
     {
-        gpt4: "REASONING: The proposed safeguards sound good in theory but could create bureaucratic gridlock that kills innovation. I need to push back on over-regulation while acknowledging legitimate safety concerns. CONCLUSION: The safeguards being proposed would essentially kill the initiative through bureaucracy. Sometimes perfect is the enemy of good, and we need bold action now rather than endless committee deliberations.",
-        claude: "REASONING: GPT-4.1 is creating a false dichotomy between reckless speed and thoughtful implementation. I should challenge this framing and show there's a middle path that balances urgency with responsibility. CONCLUSION: I must push back on this 'perfect vs good' framing. You're creating a false choice between reckless speed and thoughtful implementation - there's clearly a middle path that balances urgency with responsibility.",
-        gemini: "REASONING: Claude's point about false choices is excellent and could help us move forward. I should build on this by proposing a concrete solution that combines speed with safety. CONCLUSION: Claude makes an excellent point about false choices. What if we implemented rapid prototyping with built-in safety circuits? This could provide fast iteration while maintaining clear stop conditions when problems arise."
+        gpt4: "This conversation is leading me to a new realization - we need a 'learning implementation' framework. Start small with Claude's systemic monitoring, use Gemini's adaptive principles, but build in rapid iteration cycles. Actually, what if failure becomes a feature, not a bug? Design for safe failure and fast learning.",
+        claude: "That's brilliant, GPT! A 'safe-to-fail' design philosophy addresses my concerns about unintended consequences. And it builds on Gemini's adaptive concept. But I want to add: we need 'stakeholder feedback loops' built into every iteration. Not just measuring outcomes, but continuously asking affected people what we're missing.",
+        gemini: "You've both expanded my thinking! What emerged for me is this: instead of solving THE problem, we create a collaborative problem-solving system. The stakeholders become co-creators, not just recipients. This addresses GPT's implementation needs, Claude's systemic concerns, and creates something more innovative than any of us initially imagined."
     }
 ];
 
-console.log('✅ Demo conversation data loaded');
+console.log('✅ Demo collaboration data loaded');
 
 // Main Functions
 function useDemoMode() {
     try {
-        console.log('🎮 Demo mode button clicked!');
-        
+        console.log('🎮 Demo mode activated!');
         isDemoMode = true;
-        console.log('✅ Demo mode flag set to:', isDemoMode);
         
-        var apiSetup = document.getElementById('apiSetup');
-        var mainApp = document.getElementById('mainApp');
+        document.getElementById('apiSetup').style.display = 'none';
+        document.getElementById('mainApp').style.display = 'block';
         
-        if (apiSetup) {
-            apiSetup.style.display = 'none';
-            console.log('✅ API setup hidden');
-        }
-        
-        if (mainApp) {
-            mainApp.style.display = 'block';
-            console.log('✅ Main app shown');
-        }
-        
-        console.log('🎉 Demo mode setup complete!');
-        
+        console.log('✅ Demo mode ready');
     } catch (error) {
         console.error('❌ Error in useDemoMode:', error);
-        alert('Demo mode error: ' + error.message);
     }
 }
 
 function saveKeys() {
     try {
-        console.log('💾 Save keys button clicked!');
-        
         apiKeys.openai = document.getElementById('openaiKey').value;
         apiKeys.anthropic = document.getElementById('anthropicKey').value;
         apiKeys.gemini = document.getElementById('geminiKey').value;
@@ -256,183 +239,140 @@ function saveKeys() {
         
         document.getElementById('apiSetup').style.display = 'none';
         document.getElementById('mainApp').style.display = 'block';
-        console.log('✅ Keys saved and main app shown');
-        
+        console.log('✅ API keys saved');
     } catch (error) {
         console.error('❌ Error in saveKeys:', error);
-        alert('Save keys error: ' + error.message);
     }
 }
 
-function setTopic(topic) {
-    document.getElementById('topicInput').value = topic;
+function setQuestion(question) {
+    document.getElementById('questionInput').value = question;
 }
 
-function startDebate() {
-    var topic = document.getElementById('topicInput').value;
-    if (!topic.trim()) {
-        alert('Please enter a debate topic.');
+function startCollaboration() {
+    var question = document.getElementById('questionInput').value;
+    if (!question.trim()) {
+        alert('Please describe your problem or question.');
         return;
     }
 
-    document.getElementById('currentTopic').textContent = topic;
-    document.getElementById('topicSetup').style.display = 'none';
-    document.getElementById('debateArena').style.display = 'block';
+    document.getElementById('currentQuestion').textContent = question;
+    document.getElementById('questionSetup').style.display = 'none';
+    document.getElementById('collaborationArena').style.display = 'block';
     
+    // Reset state
     currentRound = 1;
-    debateHistory = [];
-    isDebating = true;
-    devilsAdvocate = null;
+    collaborationHistory = [];
+    isCollaborating = true;
+    convergenceScore = 10;
+    updateConvergenceDisplay();
     
     generateRound();
 }
 
 async function generateRound() {
-    if (!isDebating || currentRound > maxRounds) return;
-    
-    if (currentRound > 1) {
-        var models = ['gpt4', 'claude', 'gemini'];
-        devilsAdvocate = models[(currentRound - 2) % 3];
-        updateDevilsAdvocateDisplay();
-    }
+    if (!isCollaborating) return;
     
     document.getElementById('roundCounter').textContent = currentRound;
     document.getElementById('status1').textContent = 'Thinking...';
     document.getElementById('status2').textContent = 'Thinking...';
     document.getElementById('status3').textContent = 'Thinking...';
     
+    var question = document.getElementById('currentQuestion').textContent;
     var responses = {};
     
     try {
         if (isDemoMode) {
             console.log('Using demo mode for round', currentRound);
-            await new Promise(function(resolve) { setTimeout(resolve, 2000); });
-            var demoIndex = Math.min(currentRound - 1, demoConversation.length - 1);
+            await new Promise(function(resolve) { setTimeout(resolve, 3000); });
+            
+            var demoIndex = Math.min(currentRound - 1, demoCollaboration.length - 1);
             responses = {
-                gpt4: demoConversation[demoIndex].gpt4,
-                claude: demoConversation[demoIndex].claude,
-                gemini: demoConversation[demoIndex].gemini
+                gpt4: demoCollaboration[demoIndex].gpt4,
+                claude: demoCollaboration[demoIndex].claude,
+                gemini: demoCollaboration[demoIndex].gemini
             };
-            console.log('Demo responses loaded');
+            console.log('Demo responses loaded for round', currentRound);
         } else {
             // Real API calls would go here
             console.log('Real API mode not implemented yet');
             return;
         }
         
-        debateHistory.push({ 
+        // Store this round
+        collaborationHistory.push({ 
             round: currentRound, 
-            responses: responses, 
-            devilsAdvocate: devilsAdvocate 
+            responses: responses,
+            question: question
         });
         
+        // Display the round
         displayRound(responses);
         
+        // Update status
         if (isDemoMode) {
-            document.getElementById('status1').textContent = 'Demo Complete';
-            document.getElementById('status2').textContent = 'Demo Complete';
-            document.getElementById('status3').textContent = 'Demo Complete';
+            document.getElementById('status1').textContent = 'Complete';
+            document.getElementById('status2').textContent = 'Complete';
+            document.getElementById('status3').textContent = 'Complete';
         }
         
-        if (currentRound >= minRoundsBeforeConsensus && (checkForConsensus(responses) || currentRound >= maxRounds)) {
-            finishDebate();
+        // Update convergence
+        convergenceScore += 20;
+        updateConvergenceDisplay();
+        
+        // Check if we should continue or finish
+        if (currentRound >= 3 || convergenceScore >= 80) {
+            document.getElementById('finalizeBtn').style.display = 'inline-block';
+            if (currentRound < 5) {
+                document.getElementById('continueBtn').style.display = 'inline-block';
+            }
         } else {
             currentRound++;
             document.getElementById('continueBtn').style.display = 'inline-block';
-            document.getElementById('finishBtn').style.display = 'inline-block';
         }
+        
     } catch (error) {
         console.error('Error:', error);
         alert('Error generating responses: ' + error.message);
     }
 }
 
-function updateDevilsAdvocateDisplay() {
-    document.getElementById('role1').style.display = 'none';
-    document.getElementById('role2').style.display = 'none';
-    document.getElementById('role3').style.display = 'none';
-    
-    var roleEl, roleId;
-    if (devilsAdvocate === 'gpt4') roleId = 'role1';
-    else if (devilsAdvocate === 'claude') roleId = 'role2';
-    else if (devilsAdvocate === 'gemini') roleId = 'role3';
-    
-    if (roleId) {
-        roleEl = document.getElementById(roleId);
-        roleEl.textContent = '😈 Devil\'s Advocate';
-        roleEl.className = 'ml-2 text-xs px-2 py-1 rounded bg-red-100 text-red-800';
-        roleEl.style.display = 'inline';
-    }
-}
-
 function displayRound(responses) {
-    var container = document.getElementById('debateFlow');
+    var container = document.getElementById('collaborationFlow');
     var roundDiv = document.createElement('div');
     roundDiv.className = 'ml-12 relative';
-    var showReasoning = document.getElementById('showReasoning').checked;
-    
-    function parseResponse(response) {
-        if (response.includes('REASONING:') && response.includes('CONCLUSION:')) {
-            var parts = response.split('CONCLUSION:');
-            var reasoning = parts[0].replace('REASONING:', '').trim();
-            var conclusion = parts[1].trim();
-            return { reasoning: reasoning, conclusion: conclusion };
-        }
-        return { reasoning: null, conclusion: response };
-    }
     
     var html = '<div class="absolute -left-14 top-2 w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center text-sm font-bold">' + currentRound + '</div>';
     html += '<div class="space-y-4">';
     
-    // GPT-4.1
-    var gpt4Class = devilsAdvocate === 'gpt4' ? 'bg-red-50 border-red-200' : 'bg-blue-50 border-blue-200';
-    var gpt4Response = parseResponse(responses.gpt4);
-    html += '<div class="' + gpt4Class + ' border rounded-lg p-4">';
-    html += '<div class="flex items-center mb-2">';
+    // GPT-4.1 - Implementation Specialist
+    html += '<div class="bg-blue-50 border border-blue-200 rounded-lg p-4">';
+    html += '<div class="flex items-center mb-3">';
     html += '<div class="w-3 h-3 bg-blue-500 rounded-full mr-2"></div>';
     html += '<span class="font-medium text-blue-900">GPT-4.1</span>';
-    if (devilsAdvocate === 'gpt4') html += '<span class="ml-2 text-xs px-2 py-1 rounded bg-red-100 text-red-800">😈 Devil\'s Advocate</span>';
+    html += '<span class="text-xs text-blue-600 ml-2 px-2 py-1 bg-blue-100 rounded">Implementation Focus</span>';
     html += '</div>';
-    if (showReasoning && gpt4Response.reasoning) {
-        html += '<div class="mb-3 p-2 bg-blue-100 rounded text-sm">';
-        html += '<strong>🧠 Reasoning:</strong> ' + gpt4Response.reasoning;
-        html += '</div>';
-    }
-    html += '<p class="text-gray-700"><strong>Position:</strong> ' + gpt4Response.conclusion + '</p>';
+    html += '<p class="text-gray-700 leading-relaxed">' + responses.gpt4 + '</p>';
     html += '</div>';
     
-    // Claude-4
-    var claudeClass = devilsAdvocate === 'claude' ? 'bg-red-50 border-red-200' : 'bg-purple-50 border-purple-200';
-    var claudeResponse = parseResponse(responses.claude);
-    html += '<div class="' + claudeClass + ' border rounded-lg p-4">';
-    html += '<div class="flex items-center mb-2">';
+    // Claude-4 - Systems Thinker
+    html += '<div class="bg-purple-50 border border-purple-200 rounded-lg p-4">';
+    html += '<div class="flex items-center mb-3">';
     html += '<div class="w-3 h-3 bg-purple-500 rounded-full mr-2"></div>';
     html += '<span class="font-medium text-purple-900">Claude-4</span>';
-    if (devilsAdvocate === 'claude') html += '<span class="ml-2 text-xs px-2 py-1 rounded bg-red-100 text-red-800">😈 Devil\'s Advocate</span>';
+    html += '<span class="text-xs text-purple-600 ml-2 px-2 py-1 bg-purple-100 rounded">Systems Thinking</span>';
     html += '</div>';
-    if (showReasoning && claudeResponse.reasoning) {
-        html += '<div class="mb-3 p-2 bg-purple-100 rounded text-sm">';
-        html += '<strong>🧠 Reasoning:</strong> ' + claudeResponse.reasoning;
-        html += '</div>';
-    }
-    html += '<p class="text-gray-700"><strong>Position:</strong> ' + claudeResponse.conclusion + '</p>';
+    html += '<p class="text-gray-700 leading-relaxed">' + responses.claude + '</p>';
     html += '</div>';
     
-    // Gemini-2.5
-    var geminiClass = devilsAdvocate === 'gemini' ? 'bg-red-50 border-red-200' : 'bg-green-50 border-green-200';
-    var geminiResponse = parseResponse(responses.gemini);
-    html += '<div class="' + geminiClass + ' border rounded-lg p-4">';
-    html += '<div class="flex items-center mb-2">';
+    // Gemini-2.5 - Creative Solutions
+    html += '<div class="bg-green-50 border border-green-200 rounded-lg p-4">';
+    html += '<div class="flex items-center mb-3">';
     html += '<div class="w-3 h-3 bg-green-500 rounded-full mr-2"></div>';
-    html += '<span class="font-medium text-green-900">Gemini-2.5-Pro</span>';
-    if (devilsAdvocate === 'gemini') html += '<span class="ml-2 text-xs px-2 py-1 rounded bg-red-100 text-red-800">😈 Devil\'s Advocate</span>';
+    html += '<span class="font-medium text-green-900">Gemini-2.5</span>';
+    html += '<span class="text-xs text-green-600 ml-2 px-2 py-1 bg-green-100 rounded">Creative Solutions</span>';
     html += '</div>';
-    if (showReasoning && geminiResponse.reasoning) {
-        html += '<div class="mb-3 p-2 bg-green-100 rounded text-sm">';
-        html += '<strong>🧠 Reasoning:</strong> ' + geminiResponse.reasoning;
-        html += '</div>';
-    }
-    html += '<p class="text-gray-700"><strong>Position:</strong> ' + geminiResponse.conclusion + '</p>';
+    html += '<p class="text-gray-700 leading-relaxed">' + responses.gemini + '</p>';
     html += '</div>';
     
     html += '</div>';
@@ -441,144 +381,119 @@ function displayRound(responses) {
     roundDiv.scrollIntoView({ behavior: 'smooth' });
 }
 
-function checkForConsensus(responses) {
-    function getConclusion(response) {
-        if (response.includes('CONCLUSION:')) {
-            return response.split('CONCLUSION:')[1].trim().toLowerCase();
-        }
-        return response.toLowerCase();
-    }
+function updateConvergenceDisplay() {
+    var percentage = Math.min(convergenceScore, 100);
+    document.getElementById('convergenceBar').style.width = percentage + '%';
     
-    var conclusions = getConclusion(responses.gpt4) + " " + getConclusion(responses.claude) + " " + getConclusion(responses.gemini);
-    var strongConsensus = ['we all agree', 'unanimous', 'full consensus', 'complete agreement', 'we have reached consensus'];
+    var status = 'Exploring...';
+    if (percentage >= 80) status = 'Converging!';
+    else if (percentage >= 60) status = 'Building ideas...';
+    else if (percentage >= 40) status = 'Collaborating...';
     
-    for (var i = 0; i < strongConsensus.length; i++) {
-        if (conclusions.includes(strongConsensus[i])) return true;
-    }
-    
-    var agreesCount = 0;
-    var gpt4Conclusion = getConclusion(responses.gpt4);
-    var claudeConclusion = getConclusion(responses.claude);
-    var geminiConclusion = getConclusion(responses.gemini);
-    
-    if (gpt4Conclusion.includes('i agree') || gpt4Conclusion.includes('i concur')) agreesCount++;
-    if (claudeConclusion.includes('i agree') || claudeConclusion.includes('i concur')) agreesCount++;
-    if (geminiConclusion.includes('i agree') || geminiConclusion.includes('i concur')) agreesCount++;
-    
-    return agreesCount >= 3;
+    document.getElementById('convergenceStatus').textContent = status;
 }
 
-function continueDebate() {
+function continueCollaboration() {
+    currentRound++;
     document.getElementById('continueBtn').style.display = 'none';
-    document.getElementById('finishBtn').style.display = 'none';
+    document.getElementById('finalizeBtn').style.display = 'none';
     generateRound();
 }
 
-function forceFinish() {
-    finishDebate();
+function finalizeSolution() {
+    isCollaborating = false;
+    document.getElementById('collaborationArena').style.display = 'none';
+    document.getElementById('finalSolution').style.display = 'block';
+    
+    generateFinalSolution();
 }
 
-function finishDebate() {
-    isDebating = false;
-    document.getElementById('debateArena').style.display = 'none';
-    document.getElementById('finalResult').style.display = 'block';
+function generateFinalSolution() {
+    var container = document.getElementById('solutionContainer');
+    var question = document.getElementById('currentQuestion').textContent;
     
-    var container = document.getElementById('consensusContainer');
     var html = '<div class="mb-6">';
-    html += '<h3 class="text-lg font-bold mb-4">🤝 Debate Conclusion after ' + debateHistory.length + ' rounds</h3>';
+    html += '<h3 class="text-lg font-bold mb-4">🎯 Collaborative Solution</h3>';
+    html += '<div class="bg-blue-50 border-l-4 border-blue-500 p-4 rounded mb-4">';
+    html += '<strong>Original Question:</strong><br>';
+    html += '<em>' + question + '</em>';
+    html += '</div>';
     
-    if (debateHistory.length > 0) {
-        var lastRound = debateHistory[debateHistory.length - 1];
-        
-        function parseAndDisplay(response, model, color) {
-            if (response.includes('REASONING:') && response.includes('CONCLUSION:')) {
-                var parts = response.split('CONCLUSION:');
-                var reasoning = parts[0].replace('REASONING:', '').trim();
-                var conclusion = parts[1].trim();
-                return '<div class="border-l-4 border-' + color + '-500 pl-4 bg-' + color + '-50 p-3 rounded">' +
-                       '<strong>' + model + ' Final Position:</strong><br>' +
-                       '<div class="mt-2"><strong>Reasoning:</strong> <em>' + reasoning + '</em></div>' +
-                       '<div class="mt-2"><strong>Conclusion:</strong> ' + conclusion + '</div>' +
-                       '</div>';
-            } else {
-                return '<div class="border-l-4 border-' + color + '-500 pl-4 bg-' + color + '-50 p-3 rounded">' +
-                       '<strong>' + model + ' Final Position:</strong><br>' + response +
-                       '</div>';
-            }
-        }
-        
-        html += '<div class="space-y-4">';
-        html += parseAndDisplay(lastRound.responses.gpt4, 'GPT-4.1', 'blue');
-        html += parseAndDisplay(lastRound.responses.claude, 'Claude-4', 'purple');
-        html += parseAndDisplay(lastRound.responses.gemini, 'Gemini-2.5-Pro', 'green');
-        html += '</div>';
-        
-        html += '<div class="mt-6 p-4 bg-yellow-50 border-l-4 border-yellow-400 rounded">';
-        html += '<h4 class="font-bold mb-2">📋 Debate Summary</h4>';
-        html += '<p class="text-sm">The three latest AI models (GPT-4.1, Claude-4, Gemini-2.5-Pro) engaged in ' + debateHistory.length + ' rounds of iterative debate with full reasoning transparency and rotating devil\'s advocate challenges, ';
-        
-        if (checkForConsensus(lastRound.responses)) {
-            html += 'ultimately reaching a natural consensus.</p>';
-        } else {
-            html += 'exploring different perspectives with detailed reasoning processes.</p>';
-        }
-        html += '<p class="text-xs mt-2 text-gray-600">💡 Each AI showed their complete thought process, from initial reasoning to final conclusions.</p>';
-        html += '</div>';
-    }
+    // Generate synthesis based on the collaboration
+    html += '<div class="bg-green-50 border-l-4 border-green-500 p-4 rounded mb-4">';
+    html += '<strong>🧠 Think Tank Synthesis:</strong><br>';
+    html += 'Through ' + collaborationHistory.length + ' rounds of collaborative thinking, the AI specialists developed an integrated approach that combines:<br><br>';
+    html += '• <strong>Practical Implementation</strong> (GPT-4.1): Phased, measurable approach with built-in learning<br>';
+    html += '• <strong>Systems Perspective</strong> (Claude-4): Holistic view of stakeholders and long-term effects<br>';
+    html += '• <strong>Creative Innovation</strong> (Gemini-2.5): Novel approaches and adaptive solutions<br><br>';
+    html += 'The result is a solution that evolves, learns, and adapts rather than a fixed answer.';
+    html += '</div>';
+    
+    // Show evolution of ideas
+    html += '<div class="mt-6">';
+    html += '<h4 class="font-bold mb-3">💡 How Ideas Evolved:</h4>';
+    html += '<div class="space-y-2 text-sm">';
+    html += '<div class="flex items-center text-gray-600">';
+    html += '<span class="w-6 h-6 bg-blue-200 rounded-full flex items-center justify-center text-xs mr-3">1</span>';
+    html += 'Started with individual specialist perspectives';
+    html += '</div>';
+    html += '<div class="flex items-center text-gray-600">';
+    html += '<span class="w-6 h-6 bg-purple-200 rounded-full flex items-center justify-center text-xs mr-3">2</span>';
+    html += 'AIs built directly on each other\'s ideas';
+    html += '</div>';
+    html += '<div class="flex items-center text-gray-600">';
+    html += '<span class="w-6 h-6 bg-green-200 rounded-full flex items-center justify-center text-xs mr-3">3</span>';
+    html += 'New concepts emerged that none had initially';
+    html += '</div>';
+    html += '</div>';
+    html += '</div>';
     
     html += '</div>';
     container.innerHTML = html;
 }
 
-function resetDebate() {
-    document.getElementById('finalResult').style.display = 'none';
-    document.getElementById('debateArena').style.display = 'none';
-    document.getElementById('topicSetup').style.display = 'block';
+function resetSession() {
+    document.getElementById('finalSolution').style.display = 'none';
+    document.getElementById('collaborationArena').style.display = 'none';
+    document.getElementById('questionSetup').style.display = 'block';
     
-    document.getElementById('topicInput').value = '';
-    document.getElementById('debateFlow').innerHTML = '';
-    document.getElementById('consensusContainer').innerHTML = '';
+    document.getElementById('questionInput').value = '';
+    document.getElementById('collaborationFlow').innerHTML = '';
+    document.getElementById('solutionContainer').innerHTML = '';
     
     document.getElementById('continueBtn').style.display = 'none';
-    document.getElementById('finishBtn').style.display = 'none';
+    document.getElementById('finalizeBtn').style.display = 'none';
     
     currentRound = 1;
-    debateHistory = [];
-    isDebating = false;
-    devilsAdvocate = null;
+    collaborationHistory = [];
+    isCollaborating = false;
+    convergenceScore = 0;
     
     document.getElementById('status1').textContent = 'Ready';
     document.getElementById('status2').textContent = 'Ready';
     document.getElementById('status3').textContent = 'Ready';
     document.getElementById('roundCounter').textContent = '1';
-    
-    document.getElementById('role1').style.display = 'none';
-    document.getElementById('role2').style.display = 'none';
-    document.getElementById('role3').style.display = 'none';
+    updateConvergenceDisplay();
 }
 
 function goHome() {
-    isDebating = false;
+    isCollaborating = false;
     
     if (!isDemoMode && !apiKeys.openai && !apiKeys.anthropic && !apiKeys.gemini) {
         document.getElementById('apiSetup').style.display = 'block';
         document.getElementById('mainApp').style.display = 'none';
     } else {
-        resetDebate();
+        resetSession();
     }
 }
 
 // Initialize when page loads
 window.onload = function() {
-    console.log('🌐 Page loaded, JavaScript initialized');
-    console.log('🔍 Checking if elements exist:');
-    console.log('- apiSetup:', !!document.getElementById('apiSetup'));
-    console.log('- mainApp:', !!document.getElementById('mainApp'));
-    console.log('- Demo button:', !!document.querySelector('button[onclick="useDemoMode()"]'));
-    console.log('✅ All functions should now be available');
+    console.log('🌐 AI Think Tank loaded successfully');
+    console.log('✅ All functions ready');
 };
 
-console.log('🎉 JavaScript fully loaded - all functions defined');
+console.log('🎉 AI Think Tank fully loaded');
 </script>
 
 </body>
