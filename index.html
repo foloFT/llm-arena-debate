@@ -390,125 +390,8 @@ function generateFinalSolution() {
     var container = document.getElementById('solutionContainer');
     var question = document.getElementById('currentQuestion').textContent;
     
-    // Generate actual solution based on the collaboration
-    var actualSolution = "";
-    
-    if (isDemoMode) {
-        // Create a real answer based on the demo question and collaboration
-        if (question.toLowerCase().includes('productivity') && question.toLowerCase().includes('remote')) {
-            actualSolution = `
-                <div class="bg-green-50 border-l-4 border-green-500 p-6 rounded mb-4">
-                    <h4 class="font-bold text-green-800 mb-3">🎯 Complete Solution for Remote Team Productivity</h4>
-                    
-                    <div class="space-y-4 text-gray-700">
-                        <div>
-                            <strong class="text-green-700">Immediate Actions (Week 1-2):</strong>
-                            <ul class="ml-4 mt-2 space-y-1">
-                                <li>• Set up weekly 30-minute individual check-ins with each team member</li>
-                                <li>• Implement daily async status updates using Slack or similar tool</li>
-                                <li>• Create shared team calendar with "focus time" blocks (no meetings 9-11 AM)</li>
-                            </ul>
-                        </div>
-                        
-                        <div>
-                            <strong class="text-green-700">System Changes (Month 1):</strong>
-                            <ul class="ml-4 mt-2 space-y-1">
-                                <li>• Move from daily video calls to 3x/week + async updates</li>
-                                <li>• Create project dashboards where everyone can see progress without asking</li>
-                                <li>• Set up "office hours" - 2 hours daily when everyone's available for quick questions</li>
-                            </ul>
-                        </div>
-                        
-                        <div>
-                            <strong class="text-green-700">Work-Life Balance Protection:</strong>
-                            <ul class="ml-4 mt-2 space-y-1">
-                                <li>• No messages after 6 PM local time (use scheduling features)</li>
-                                <li>• Encourage "camera optional" meetings to reduce fatigue</li>
-                                <li>• Monthly team social sessions (non-work activities)</li>
-                            </ul>
-                        </div>
-                        
-                        <div>
-                            <strong class="text-green-700">Measurement & Adaptation:</strong>
-                            <ul class="ml-4 mt-2 space-y-1">
-                                <li>• Track: Project completion rates, response times, team satisfaction scores</li>
-                                <li>• Monthly team retrospectives to adjust the system</li>
-                                <li>• Individual productivity metrics (let people choose their own)</li>
-                            </ul>
-                        </div>
-                    </div>
-                </div>
-            `;
-        } else if (question.toLowerCase().includes('startup') && question.toLowerCase().includes('ai')) {
-            actualSolution = `
-                <div class="bg-green-50 border-l-4 border-green-500 p-6 rounded mb-4">
-                    <h4 class="font-bold text-green-800 mb-3">🎯 AI Startup Strategy Against Larger Companies</h4>
-                    
-                    <div class="space-y-4 text-gray-700">
-                        <div>
-                            <strong class="text-green-700">Focus Strategy - Pick Your Battle:</strong>
-                            <ul class="ml-4 mt-2 space-y-1">
-                                <li>• Choose one specific industry vertical (healthcare, finance, education)</li>
-                                <li>• Become the absolute expert in that niche's unique problems</li>
-                                <li>• Big companies can't move fast enough to dominate every vertical</li>
-                            </ul>
-                        </div>
-                        
-                        <div>
-                            <strong class="text-green-700">Speed Advantage:</strong>
-                            <ul class="ml-4 mt-2 space-y-1">
-                                <li>• Ship features weekly, not quarterly like big companies</li>
-                                <li>• Direct customer feedback loop - you can pivot in days, they need months</li>
-                                <li>• Use their slow decision-making against them</li>
-                            </ul>
-                        </div>
-                        
-                        <div>
-                            <strong class="text-green-700">Partnership, Not Competition:</strong>
-                            <ul class="ml-4 mt-2 space-y-1">
-                                <li>• Build on top of their platforms (OpenAI API, Google Cloud, etc.)</li>
-                                <li>• Position as "specialized solution for X industry"</li>
-                                <li>• Eventually, they might acquire you (exit strategy)</li>
-                            </ul>
-                        </div>
-                        
-                        <div>
-                            <strong class="text-green-700">Customer Relationship Advantage:</strong>
-                            <ul class="ml-4 mt-2 space-y-1">
-                                <li>• Offer human support (they use chatbots)</li>
-                                <li>• Custom implementations (they offer one-size-fits-all)</li>
-                                <li>• Build personal relationships with key clients</li>
-                            </ul>
-                        </div>
-                    </div>
-                </div>
-            `;
-        } else {
-            // Generic solution format for other questions
-            actualSolution = `
-                <div class="bg-green-50 border-l-4 border-green-500 p-6 rounded mb-4">
-                    <h4 class="font-bold text-green-800 mb-3">🎯 Think Tank Solution</h4>
-                    
-                    <div class="space-y-4 text-gray-700">
-                        <div>
-                            <strong class="text-green-700">Immediate Next Steps:</strong>
-                            <p class="mt-2">Based on our analysis, start with these concrete actions that address the core of your question while building momentum for larger changes.</p>
-                        </div>
-                        
-                        <div>
-                            <strong class="text-green-700">Systematic Approach:</strong>
-                            <p class="mt-2">Implement a structured framework that balances quick wins with long-term strategic thinking, ensuring all stakeholders are considered.</p>
-                        </div>
-                        
-                        <div>
-                            <strong class="text-green-700">Adaptive Implementation:</strong>
-                            <p class="mt-2">Create a solution that learns and evolves based on real-world feedback, allowing for course corrections without losing momentum.</p>
-                        </div>
-                    </div>
-                </div>
-            `;
-        }
-    }
+    // Extract actual insights from the AI collaboration
+    var solution = extractSolutionFromCollaboration(question, collaborationHistory);
     
     var html = '<div class="mb-6">';
     html += '<div class="bg-blue-50 border-l-4 border-blue-500 p-4 rounded mb-6">';
@@ -516,17 +399,168 @@ function generateFinalSolution() {
     html += '<em>' + question + '</em>';
     html += '</div>';
     
-    // The actual solution
-    html += actualSolution;
+    html += solution;
     
-    // Brief process note (much shorter)
     html += '<div class="mt-6 p-3 bg-gray-50 border rounded text-sm text-gray-600">';
-    html += '<strong>💡 How this was developed:</strong> ';
-    html += 'Three AI specialists collaborated over ' + collaborationHistory.length + ' rounds, building on each other\'s ideas to create this integrated solution.';
+    html += '<strong>💡 Developed through:</strong> ';
+    html += collaborationHistory.length + ' rounds of AI specialist collaboration, with each round building on the previous insights.';
     html += '</div>';
     
     html += '</div>';
     container.innerHTML = html;
+}
+
+function extractSolutionFromCollaboration(question, history) {
+    // This function analyzes the actual AI responses and extracts actionable advice
+    // In a real implementation, this would use AI to synthesize the conversation
+    
+    if (!history || history.length === 0) {
+        return '<div class="bg-yellow-50 border-l-4 border-yellow-400 p-4 rounded">No collaboration data available.</div>';
+    }
+    
+    // Extract key themes and actionable insights from the collaboration
+    var implementationPoints = [];
+    var systemsPoints = [];
+    var creativePoints = [];
+    var timeframedActions = [];
+    
+    // Analyze each round for actionable content
+    for (var i = 0; i < history.length; i++) {
+        var round = history[i];
+        
+        // Extract specific suggestions from GPT (Implementation focus)
+        var gptText = round.responses.gpt4.toLowerCase();
+        if (gptText.includes('metrics') || gptText.includes('measure')) {
+            implementationPoints.push('Establish clear success metrics and measurement systems');
+        }
+        if (gptText.includes('phased') || gptText.includes('pilot')) {
+            implementationPoints.push('Start with pilot programs or phased rollout approach');
+        }
+        if (gptText.includes('resource') || gptText.includes('budget')) {
+            implementationPoints.push('Ensure adequate resources and budget allocation');
+        }
+        if (gptText.includes('iteration') || gptText.includes('cycle')) {
+            implementationPoints.push('Build in rapid iteration and learning cycles');
+        }
+        
+        // Extract systemic insights from Claude (Systems thinking)
+        var claudeText = round.responses.claude.toLowerCase();
+        if (claudeText.includes('stakeholder') || claudeText.includes('affected')) {
+            systemsPoints.push('Map all stakeholders and understand their perspectives');
+        }
+        if (claudeText.includes('unintended') || claudeText.includes('consequence')) {
+            systemsPoints.push('Plan for and monitor potential unintended consequences');
+        }
+        if (claudeText.includes('feedback') || claudeText.includes('loop')) {
+            systemsPoints.push('Create continuous feedback loops from affected parties');
+        }
+        if (claudeText.includes('ethical') || claudeText.includes('values')) {
+            systemsPoints.push('Ensure alignment with core values and ethical considerations');
+        }
+        
+        // Extract innovative approaches from Gemini (Creative solutions)
+        var geminiText = round.responses.gemini.toLowerCase();
+        if (geminiText.includes('different') || geminiText.includes('alternative')) {
+            creativePoints.push('Explore alternative approaches and unconventional solutions');
+        }
+        if (geminiText.includes('partnership') || geminiText.includes('collaborate')) {
+            creativePoints.push('Consider strategic partnerships and collaborative approaches');
+        }
+        if (geminiText.includes('technology') || geminiText.includes('innovation')) {
+            creativePoints.push('Leverage emerging technologies and innovative tools');
+        }
+        if (geminiText.includes('adaptive') || geminiText.includes('evolving')) {
+            creativePoints.push('Design adaptive systems that can evolve with changing needs');
+        }
+    }
+    
+    // Create timeframed implementation based on insights
+    if (implementationPoints.length > 0) {
+        timeframedActions.push({
+            phase: 'Immediate Actions (Week 1-2)',
+            actions: [
+                implementationPoints[0] || 'Define clear objectives and success criteria',
+                'Identify key stakeholders and gather initial requirements',
+                'Assess available resources and constraints'
+            ]
+        });
+    }
+    
+    if (systemsPoints.length > 0 || implementationPoints.length > 1) {
+        timeframedActions.push({
+            phase: 'Foundation Building (Month 1)',
+            actions: [
+                systemsPoints[0] || 'Map stakeholder relationships and impact areas',
+                implementationPoints[1] || 'Design pilot program or initial implementation phase',
+                'Establish monitoring and feedback mechanisms'
+            ]
+        });
+    }
+    
+    if (creativePoints.length > 0) {
+        timeframedActions.push({
+            phase: 'Innovation & Scaling (Month 2-3)',
+            actions: [
+                creativePoints[0] || 'Explore innovative approaches and alternative solutions',
+                'Build strategic partnerships where beneficial',
+                'Implement adaptive mechanisms for continuous improvement'
+            ]
+        });
+    }
+    
+    // Always include ongoing optimization
+    timeframedActions.push({
+        phase: 'Optimization & Evolution (Ongoing)',
+        actions: [
+            'Regular review and adjustment based on results',
+            'Scale successful elements while discontinuing ineffective approaches',
+            'Maintain stakeholder engagement and feedback integration'
+        ]
+    });
+    
+    // Build the solution HTML
+    var solutionHtml = '<div class="bg-green-50 border-l-4 border-green-500 p-6 rounded mb-4">';
+    solutionHtml += '<h4 class="font-bold text-green-800 mb-4">🎯 Comprehensive Implementation Strategy</h4>';
+    solutionHtml += '<div class="space-y-5">';
+    
+    var colors = ['blue', 'purple', 'green', 'orange'];
+    for (var i = 0; i < timeframedActions.length; i++) {
+        var phase = timeframedActions[i];
+        var color = colors[i % colors.length];
+        
+        solutionHtml += '<div class="bg-white p-4 rounded border-l-4 border-' + color + '-400">';
+        solutionHtml += '<h5 class="font-bold text-' + color + '-700 mb-2">📅 ' + phase.phase + '</h5>';
+        solutionHtml += '<ul class="space-y-1 text-gray-700">';
+        
+        for (var j = 0; j < phase.actions.length; j++) {
+            solutionHtml += '<li>• ' + phase.actions[j] + '</li>';
+        }
+        
+        solutionHtml += '</ul></div>';
+    }
+    
+    // Add key insights summary if we have specific points
+    if (implementationPoints.length > 0 || systemsPoints.length > 0 || creativePoints.length > 0) {
+        solutionHtml += '<div class="bg-white p-4 rounded border-l-4 border-yellow-400">';
+        solutionHtml += '<h5 class="font-bold text-yellow-700 mb-2">💡 Key Strategic Insights</h5>';
+        solutionHtml += '<div class="text-gray-700 space-y-1">';
+        
+        if (implementationPoints.length > 0) {
+            solutionHtml += '<p><strong>Implementation Focus:</strong> ' + implementationPoints.slice(0, 2).join(', ').toLowerCase() + '</p>';
+        }
+        if (systemsPoints.length > 0) {
+            solutionHtml += '<p><strong>Systems Consideration:</strong> ' + systemsPoints.slice(0, 2).join(', ').toLowerCase() + '</p>';
+        }
+        if (creativePoints.length > 0) {
+            solutionHtml += '<p><strong>Innovation Opportunity:</strong> ' + creativePoints.slice(0, 2).join(', ').toLowerCase() + '</p>';
+        }
+        
+        solutionHtml += '</div></div>';
+    }
+    
+    solutionHtml += '</div></div>';
+    
+    return solutionHtml;
 }
 
 function resetSession() {
