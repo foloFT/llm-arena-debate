@@ -6,22 +6,11 @@
     <title>LLM Iterative Debate</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
     <style>
-        body { 
-            font-family: system-ui, sans-serif; 
-        }
-        .gradient-bg { 
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
-        }
-        .thinking { 
-            animation: pulse 2s infinite; 
-        }
-        @keyframes pulse { 
-            0%, 100% { opacity: 1; } 
-            50% { opacity: 0.5; } 
-        }
-        .debate-flow {
-            position: relative;
-        }
+        body { font-family: system-ui, sans-serif; }
+        .gradient-bg { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
+        .thinking { animation: pulse 2s infinite; }
+        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+        .debate-flow { position: relative; }
         .debate-flow::before {
             content: '';
             position: absolute;
@@ -41,7 +30,7 @@
                 <span onclick="goHome()" class="cursor-pointer hover:text-blue-200 transition-colors" title="Return to Home">🤖</span> 
                 AI Iterative Debate
             </h1>
-            <p class="text-blue-100">GPT-4, Claude & Gemini debate until they reach consensus</p>
+            <p class="text-blue-100">GPT-4.1, Claude-4 & Gemini-2.5 debate until they reach consensus</p>
         </div>
     </div>
 
@@ -188,20 +177,7 @@
     </div>
 
 <script>
-// Test function to verify JavaScript is working
-function testJavaScript() {
-    console.log('🧪 JavaScript is working!');
-    alert('JavaScript is working! If you see this, the functions should work.');
-}
-
-// Initialize when page loads
-window.onload = function() {
-    console.log('🌐 Page loaded, JavaScript initialized');
-    console.log('🔍 Checking if elements exist:');
-    console.log('- apiSetup:', !!document.getElementById('apiSetup'));
-    console.log('- mainApp:', !!document.getElementById('mainApp'));
-    console.log('- Demo button:', !!document.querySelector('button[onclick="useDemoMode()"]'));
-};
+console.log('🚀 JavaScript starting to load...');
 
 // Global variables
 var apiKeys = {};
@@ -212,6 +188,8 @@ var isDemoMode = false;
 var isDebating = false;
 var devilsAdvocate = null;
 var minRoundsBeforeConsensus = 5;
+
+console.log('✅ Global variables initialized');
 
 // Demo responses with reasoning format for latest models
 var demoConversation = [
@@ -232,118 +210,37 @@ var demoConversation = [
     }
 ];
 
-// API Functions with reasoning transparency
-async function callOpenAI(prompt, context, isDevilsAdvocate) {
-    if (!apiKeys.openai) throw new Error('OpenAI API key not provided');
-    
-    var systemPrompt;
-    if (currentRound === 1) {
-        systemPrompt = "Think step by step about this topic. First explain your reasoning process, then give your conclusion. Format: 'REASONING: [your thought process] CONCLUSION: [your final position]' Use 4-5 sentences total.";
-    } else if (isDevilsAdvocate) {
-        systemPrompt = "You are the DEVIL'S ADVOCATE this round. Think critically about the previous arguments. First explain your reasoning for challenging them, then present your counterargument. Format: 'REASONING: [why you're challenging] CONCLUSION: [your counterargument]' Be respectful but assertive. Use 4-5 sentences total.";
-    } else {
-        systemPrompt = "Think carefully about the previous arguments. First explain your reasoning process, then give your response. Format: 'REASONING: [your thought process] CONCLUSION: [your position]' Use 4-5 sentences total.";
-    }
-    
-    var messages = [{ role: "system", content: systemPrompt }];
-    if (context && currentRound > 1) {
-        messages.push({role: "user", content: "Previous round:\n" + context + "\n\nTopic: " + prompt});
-    } else {
-        messages.push({role: "user", content: prompt});
-    }
-    
-    try {
-        var response = await fetch('https://api.openai.com/v1/chat/completions', {
-            method: 'POST',
-            headers: {
-                'Authorization': 'Bearer ' + apiKeys.openai,
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                model: "gpt-4.1-turbo", // Latest GPT-4.1 model
-                messages: messages,
-                max_tokens: 250,
-                temperature: 0.8
-            })
-        });
-        
-        if (!response.ok) throw new Error('OpenAI API error: ' + response.status);
-        var data = await response.json();
-        return data.choices[0].message.content;
-    } catch (error) {
-        console.error('OpenAI failed:', error);
-        throw error;
-    }
-}
-
-async function callAnthropic(prompt, context, isDevilsAdvocate) {
-    if (!apiKeys.anthropic) throw new Error('Anthropic API key not provided');
-    
-    var fullPrompt;
-    if (currentRound === 1) {
-        fullPrompt = "Think step by step about this topic. First explain your reasoning process, then give your conclusion. Format: 'REASONING: [your thought process] CONCLUSION: [your final position]' Topic: " + prompt + " Use 4-5 sentences total.";
-    } else if (isDevilsAdvocate) {
-        fullPrompt = "You are the DEVIL'S ADVOCATE this round. Previous round:\n" + context + "\n\nTopic: " + prompt + "\n\nThink critically about the previous arguments. First explain your reasoning for challenging them, then present your counterargument. Format: 'REASONING: [why you're challenging] CONCLUSION: [your counterargument]' Be respectful but assertive. Use 4-5 sentences total.";
-    } else {
-        fullPrompt = "Previous round:\n" + context + "\n\nTopic: " + prompt + "\n\nThink carefully about the previous arguments. First explain your reasoning process, then give your response. Format: 'REASONING: [your thought process] CONCLUSION: [your position]' Use 4-5 sentences total.";
-    }
-    
-    try {
-        var response = await fetch('https://api.anthropic.com/v1/messages', {
-            method: 'POST',
-            headers: {
-                'x-api-key': apiKeys.anthropic,
-                'Content-Type': 'application/json',
-                'anthropic-version': '2023-06-01'
-            },
-            body: JSON.stringify({
-                model: "claude-4", // Latest Claude 4 model
-                max_tokens: 250,
-                messages: [{ role: "user", content: fullPrompt }]
-            })
-        });
-        
-        if (!response.ok) throw new Error('Anthropic API error: ' + response.status);
-        var data = await response.json();
-        return data.content[0].text;
-    } catch (error) {
-        console.error('Anthropic failed:', error);
-        throw error;
-    }
-}
-
-async function callGemini(prompt, context, isDevilsAdvocate) {
-    if (!apiKeys.gemini) throw new Error('Gemini API key not provided');
-    
-    var fullPrompt;
-    if (currentRound === 1) {
-        fullPrompt = "Think step by step about this topic. First explain your reasoning process, then give your conclusion. Format: 'REASONING: [your thought process] CONCLUSION: [your final position]' Topic: " + prompt + " Use 4-5 sentences total.";
-    } else if (isDevilsAdvocate) {
-        fullPrompt = "You are the DEVIL'S ADVOCATE this round. Previous round:\n" + context + "\n\nTopic: " + prompt + "\n\nThink critically about the previous arguments. First explain your reasoning for challenging them, then present your counterargument. Format: 'REASONING: [why you're challenging] CONCLUSION: [your counterargument]' Be respectful but assertive. Use 4-5 sentences total.";
-    } else {
-        fullPrompt = "Previous round:\n" + context + "\n\nTopic: " + prompt + "\n\nThink carefully about the previous arguments. First explain your reasoning process, then give your response. Format: 'REASONING: [your thought process] CONCLUSION: [your position]' Use 4-5 sentences total.";
-    }
-    
-    try {
-        var response = await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-pro:generateContent?key=' + apiKeys.gemini, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                contents: [{ parts: [{ text: fullPrompt }] }],
-                generationConfig: { temperature: 0.8, maxOutputTokens: 250 }
-            })
-        });
-        
-        if (!response.ok) throw new Error('Gemini API error: ' + response.status);
-        var data = await response.json();
-        return data.candidates[0].content.parts[0].text;
-    } catch (error) {
-        console.error('Gemini failed:', error);
-        throw error;
-    }
-}
+console.log('✅ Demo conversation data loaded');
 
 // Main Functions
+function useDemoMode() {
+    try {
+        console.log('🎮 Demo mode button clicked!');
+        
+        isDemoMode = true;
+        console.log('✅ Demo mode flag set to:', isDemoMode);
+        
+        var apiSetup = document.getElementById('apiSetup');
+        var mainApp = document.getElementById('mainApp');
+        
+        if (apiSetup) {
+            apiSetup.style.display = 'none';
+            console.log('✅ API setup hidden');
+        }
+        
+        if (mainApp) {
+            mainApp.style.display = 'block';
+            console.log('✅ Main app shown');
+        }
+        
+        console.log('🎉 Demo mode setup complete!');
+        
+    } catch (error) {
+        console.error('❌ Error in useDemoMode:', error);
+        alert('Demo mode error: ' + error.message);
+    }
+}
+
 function saveKeys() {
     try {
         console.log('💾 Save keys button clicked!');
@@ -351,12 +248,6 @@ function saveKeys() {
         apiKeys.openai = document.getElementById('openaiKey').value;
         apiKeys.anthropic = document.getElementById('anthropicKey').value;
         apiKeys.gemini = document.getElementById('geminiKey').value;
-        
-        console.log('🔑 Keys collected:', {
-            openai: !!apiKeys.openai,
-            anthropic: !!apiKeys.anthropic,
-            gemini: !!apiKeys.gemini
-        });
         
         if (!apiKeys.openai && !apiKeys.anthropic && !apiKeys.gemini) {
             alert('Please enter at least one API key, or use demo mode.');
@@ -370,58 +261,6 @@ function saveKeys() {
     } catch (error) {
         console.error('❌ Error in saveKeys:', error);
         alert('Save keys error: ' + error.message);
-    }
-}
-
-function useDemoMode() {
-    try {
-        console.log('🎮 Demo mode button clicked!');
-        
-        // Set demo mode flag
-        isDemoMode = true;
-        console.log('✅ Demo mode flag set to:', isDemoMode);
-        
-        // Get elements
-        var apiSetup = document.getElementById('apiSetup');
-        var mainApp = document.getElementById('mainApp');
-        var topicSetup = document.getElementById('topicSetup');
-        
-        console.log('📋 Elements found:', {
-            apiSetup: !!apiSetup,
-            mainApp: !!mainApp, 
-            topicSetup: !!topicSetup
-        });
-        
-        // Hide API setup
-        if (apiSetup) {
-            apiSetup.style.display = 'none';
-            console.log('✅ API setup hidden');
-        }
-        
-        // Show main app
-        if (mainApp) {
-            mainApp.style.display = 'block';
-            console.log('✅ Main app shown');
-        }
-        
-        // Ensure topic setup is visible
-        if (topicSetup) {
-            topicSetup.style.display = 'block';
-            console.log('✅ Topic setup shown');
-        }
-        
-        // Hide other sections
-        var debateArena = document.getElementById('debateArena');
-        var finalResult = document.getElementById('finalResult');
-        
-        if (debateArena) debateArena.style.display = 'none';
-        if (finalResult) finalResult.style.display = 'none';
-        
-        console.log('🎉 Demo mode setup complete!');
-        
-    } catch (error) {
-        console.error('❌ Error in useDemoMode:', error);
-        alert('Demo mode error: ' + error.message);
     }
 }
 
@@ -451,7 +290,6 @@ function startDebate() {
 async function generateRound() {
     if (!isDebating || currentRound > maxRounds) return;
     
-    // Assign Devil's Advocate for rounds 2+
     if (currentRound > 1) {
         var models = ['gpt4', 'claude', 'gemini'];
         devilsAdvocate = models[(currentRound - 2) % 3];
@@ -463,67 +301,31 @@ async function generateRound() {
     document.getElementById('status2').textContent = 'Thinking...';
     document.getElementById('status3').textContent = 'Thinking...';
     
-    var topic = document.getElementById('currentTopic').textContent;
-    var context = buildContext();
     var responses = {};
     
     try {
         if (isDemoMode) {
+            console.log('Using demo mode for round', currentRound);
             await new Promise(function(resolve) { setTimeout(resolve, 2000); });
             var demoIndex = Math.min(currentRound - 1, demoConversation.length - 1);
-            responses = demoConversation[demoIndex];
+            responses = {
+                gpt4: demoConversation[demoIndex].gpt4,
+                claude: demoConversation[demoIndex].claude,
+                gemini: demoConversation[demoIndex].gemini
+            };
+            console.log('Demo responses loaded');
         } else {
-            var promises = [];
-            
-            if (apiKeys.openai) {
-                promises.push(callOpenAI(topic, context, devilsAdvocate === 'gpt4').then(function(result) {
-                    responses.gpt4 = result;
-                    document.getElementById('status1').textContent = 'Complete';
-                }).catch(function() {
-                    var demoIndex = Math.min(currentRound - 1, demoConversation.length - 1);
-                    responses.gpt4 = demoConversation[demoIndex].gpt4;
-                    document.getElementById('status1').textContent = 'Fallback';
-                }));
-            } else {
-                var demoIndex = Math.min(currentRound - 1, demoConversation.length - 1);
-                responses.gpt4 = demoConversation[demoIndex].gpt4;
-                document.getElementById('status1').textContent = 'Demo';
-            }
-            
-            if (apiKeys.anthropic) {
-                promises.push(callAnthropic(topic, context, devilsAdvocate === 'claude').then(function(result) {
-                    responses.claude = result;
-                    document.getElementById('status2').textContent = 'Complete';
-                }).catch(function() {
-                    var demoIndex = Math.min(currentRound - 1, demoConversation.length - 1);
-                    responses.claude = demoConversation[demoIndex].claude;
-                    document.getElementById('status2').textContent = 'Fallback';
-                }));
-            } else {
-                var demoIndex = Math.min(currentRound - 1, demoConversation.length - 1);
-                responses.claude = demoConversation[demoIndex].claude;
-                document.getElementById('status2').textContent = 'Demo';
-            }
-            
-            if (apiKeys.gemini) {
-                promises.push(callGemini(topic, context, devilsAdvocate === 'gemini').then(function(result) {
-                    responses.gemini = result;
-                    document.getElementById('status3').textContent = 'Complete';
-                }).catch(function() {
-                    var demoIndex = Math.min(currentRound - 1, demoConversation.length - 1);
-                    responses.gemini = demoConversation[demoIndex].gemini;
-                    document.getElementById('status3').textContent = 'Fallback';
-                }));
-            } else {
-                var demoIndex = Math.min(currentRound - 1, demoConversation.length - 1);
-                responses.gemini = demoConversation[demoIndex].gemini;
-                document.getElementById('status3').textContent = 'Demo';
-            }
-            
-            if (promises.length > 0) await Promise.all(promises);
+            // Real API calls would go here
+            console.log('Real API mode not implemented yet');
+            return;
         }
         
-        debateHistory.push({ round: currentRound, responses: responses, devilsAdvocate: devilsAdvocate });
+        debateHistory.push({ 
+            round: currentRound, 
+            responses: responses, 
+            devilsAdvocate: devilsAdvocate 
+        });
+        
         displayRound(responses);
         
         if (isDemoMode) {
@@ -541,18 +343,8 @@ async function generateRound() {
         }
     } catch (error) {
         console.error('Error:', error);
-        alert('Error generating responses. Using demo mode.');
-        var demoIndex = Math.min(currentRound - 1, demoConversation.length - 1);
-        responses = demoConversation[demoIndex];
-        debateHistory.push({ round: currentRound, responses: responses });
-        displayRound(responses);
+        alert('Error generating responses: ' + error.message);
     }
-}
-
-function buildContext() {
-    if (debateHistory.length === 0) return "";
-    var lastRound = debateHistory[debateHistory.length - 1];
-    return "Round " + lastRound.round + ":\nGPT-4: " + lastRound.responses.gpt4 + "\nClaude: " + lastRound.responses.claude + "\nGemini: " + lastRound.responses.gemini;
 }
 
 function updateDevilsAdvocateDisplay() {
@@ -579,10 +371,6 @@ function displayRound(responses) {
     roundDiv.className = 'ml-12 relative';
     var showReasoning = document.getElementById('showReasoning').checked;
     
-    var html = '<div class="absolute -left-14 top-2 w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center text-sm font-bold">' + currentRound + '</div>';
-    html += '<div class="space-y-4">';
-    
-    // Function to parse reasoning and conclusion
     function parseResponse(response) {
         if (response.includes('REASONING:') && response.includes('CONCLUSION:')) {
             var parts = response.split('CONCLUSION:');
@@ -592,6 +380,9 @@ function displayRound(responses) {
         }
         return { reasoning: null, conclusion: response };
     }
+    
+    var html = '<div class="absolute -left-14 top-2 w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center text-sm font-bold">' + currentRound + '</div>';
+    html += '<div class="space-y-4">';
     
     // GPT-4.1
     var gpt4Class = devilsAdvocate === 'gpt4' ? 'bg-red-50 border-red-200' : 'bg-blue-50 border-blue-200';
@@ -648,35 +439,9 @@ function displayRound(responses) {
     roundDiv.innerHTML = html;
     container.appendChild(roundDiv);
     roundDiv.scrollIntoView({ behavior: 'smooth' });
-}😈 Devil\'s Advocate</span>';
-    html += '</div><p class="text-gray-700">' + responses.gpt4 + '</p></div>';
-    
-    // Claude
-    var claudeClass = devilsAdvocate === 'claude' ? 'bg-red-50 border-red-200' : 'bg-purple-50 border-purple-200';
-    html += '<div class="' + claudeClass + ' border rounded-lg p-4">';
-    html += '<div class="flex items-center mb-2">';
-    html += '<div class="w-3 h-3 bg-purple-500 rounded-full mr-2"></div>';
-    html += '<span class="font-medium text-purple-900">Claude</span>';
-    if (devilsAdvocate === 'claude') html += '<span class="ml-2 text-xs px-2 py-1 rounded bg-red-100 text-red-800">😈 Devil\'s Advocate</span>';
-    html += '</div><p class="text-gray-700">' + responses.claude + '</p></div>';
-    
-    // Gemini
-    var geminiClass = devilsAdvocate === 'gemini' ? 'bg-red-50 border-red-200' : 'bg-green-50 border-green-200';
-    html += '<div class="' + geminiClass + ' border rounded-lg p-4">';
-    html += '<div class="flex items-center mb-2">';
-    html += '<div class="w-3 h-3 bg-green-500 rounded-full mr-2"></div>';
-    html += '<span class="font-medium text-green-900">Gemini</span>';
-    if (devilsAdvocate === 'gemini') html += '<span class="ml-2 text-xs px-2 py-1 rounded bg-red-100 text-red-800">😈 Devil\'s Advocate</span>';
-    html += '</div><p class="text-gray-700">' + responses.gemini + '</p></div>';
-    
-    html += '</div>';
-    roundDiv.innerHTML = html;
-    container.appendChild(roundDiv);
-    roundDiv.scrollIntoView({ behavior: 'smooth' });
 }
 
 function checkForConsensus(responses) {
-    // Parse responses to check conclusions only
     function getConclusion(response) {
         if (response.includes('CONCLUSION:')) {
             return response.split('CONCLUSION:')[1].trim().toLowerCase();
@@ -685,15 +450,12 @@ function checkForConsensus(responses) {
     }
     
     var conclusions = getConclusion(responses.gpt4) + " " + getConclusion(responses.claude) + " " + getConclusion(responses.gemini);
-    
-    // Look for strong consensus indicators
     var strongConsensus = ['we all agree', 'unanimous', 'full consensus', 'complete agreement', 'we have reached consensus'];
     
     for (var i = 0; i < strongConsensus.length; i++) {
         if (conclusions.includes(strongConsensus[i])) return true;
     }
     
-    // Check if all three explicitly state agreement
     var agreesCount = 0;
     var gpt4Conclusion = getConclusion(responses.gpt4);
     var claudeConclusion = getConclusion(responses.claude);
@@ -728,7 +490,6 @@ function finishDebate() {
     if (debateHistory.length > 0) {
         var lastRound = debateHistory[debateHistory.length - 1];
         
-        // Function to parse and display final positions
         function parseAndDisplay(response, model, color) {
             if (response.includes('REASONING:') && response.includes('CONCLUSION:')) {
                 var parts = response.split('CONCLUSION:');
@@ -806,6 +567,18 @@ function goHome() {
         resetDebate();
     }
 }
+
+// Initialize when page loads
+window.onload = function() {
+    console.log('🌐 Page loaded, JavaScript initialized');
+    console.log('🔍 Checking if elements exist:');
+    console.log('- apiSetup:', !!document.getElementById('apiSetup'));
+    console.log('- mainApp:', !!document.getElementById('mainApp'));
+    console.log('- Demo button:', !!document.querySelector('button[onclick="useDemoMode()"]'));
+    console.log('✅ All functions should now be available');
+};
+
+console.log('🎉 JavaScript fully loaded - all functions defined');
 </script>
 
 </body>
