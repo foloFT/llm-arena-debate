@@ -412,40 +412,139 @@ function generateFinalSolution() {
     var container = document.getElementById('solutionContainer');
     var question = document.getElementById('currentQuestion').textContent;
     
+    // Generate actual solution based on the collaboration
+    var actualSolution = "";
+    
+    if (isDemoMode) {
+        // Create a real answer based on the demo question and collaboration
+        if (question.toLowerCase().includes('productivity') && question.toLowerCase().includes('remote')) {
+            actualSolution = `
+                <div class="bg-green-50 border-l-4 border-green-500 p-6 rounded mb-4">
+                    <h4 class="font-bold text-green-800 mb-3">🎯 Complete Solution for Remote Team Productivity</h4>
+                    
+                    <div class="space-y-4 text-gray-700">
+                        <div>
+                            <strong class="text-green-700">Immediate Actions (Week 1-2):</strong>
+                            <ul class="ml-4 mt-2 space-y-1">
+                                <li>• Set up weekly 30-minute individual check-ins with each team member</li>
+                                <li>• Implement daily async status updates using Slack or similar tool</li>
+                                <li>• Create shared team calendar with "focus time" blocks (no meetings 9-11 AM)</li>
+                            </ul>
+                        </div>
+                        
+                        <div>
+                            <strong class="text-green-700">System Changes (Month 1):</strong>
+                            <ul class="ml-4 mt-2 space-y-1">
+                                <li>• Move from daily video calls to 3x/week + async updates</li>
+                                <li>• Create project dashboards where everyone can see progress without asking</li>
+                                <li>• Set up "office hours" - 2 hours daily when everyone's available for quick questions</li>
+                            </ul>
+                        </div>
+                        
+                        <div>
+                            <strong class="text-green-700">Work-Life Balance Protection:</strong>
+                            <ul class="ml-4 mt-2 space-y-1">
+                                <li>• No messages after 6 PM local time (use scheduling features)</li>
+                                <li>• Encourage "camera optional" meetings to reduce fatigue</li>
+                                <li>• Monthly team social sessions (non-work activities)</li>
+                            </ul>
+                        </div>
+                        
+                        <div>
+                            <strong class="text-green-700">Measurement & Adaptation:</strong>
+                            <ul class="ml-4 mt-2 space-y-1">
+                                <li>• Track: Project completion rates, response times, team satisfaction scores</li>
+                                <li>• Monthly team retrospectives to adjust the system</li>
+                                <li>• Individual productivity metrics (let people choose their own)</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            `;
+        } else if (question.toLowerCase().includes('startup') && question.toLowerCase().includes('ai')) {
+            actualSolution = `
+                <div class="bg-green-50 border-l-4 border-green-500 p-6 rounded mb-4">
+                    <h4 class="font-bold text-green-800 mb-3">🎯 AI Startup Strategy Against Larger Companies</h4>
+                    
+                    <div class="space-y-4 text-gray-700">
+                        <div>
+                            <strong class="text-green-700">Focus Strategy - Pick Your Battle:</strong>
+                            <ul class="ml-4 mt-2 space-y-1">
+                                <li>• Choose one specific industry vertical (healthcare, finance, education)</li>
+                                <li>• Become the absolute expert in that niche's unique problems</li>
+                                <li>• Big companies can't move fast enough to dominate every vertical</li>
+                            </ul>
+                        </div>
+                        
+                        <div>
+                            <strong class="text-green-700">Speed Advantage:</strong>
+                            <ul class="ml-4 mt-2 space-y-1">
+                                <li>• Ship features weekly, not quarterly like big companies</li>
+                                <li>• Direct customer feedback loop - you can pivot in days, they need months</li>
+                                <li>• Use their slow decision-making against them</li>
+                            </ul>
+                        </div>
+                        
+                        <div>
+                            <strong class="text-green-700">Partnership, Not Competition:</strong>
+                            <ul class="ml-4 mt-2 space-y-1">
+                                <li>• Build on top of their platforms (OpenAI API, Google Cloud, etc.)</li>
+                                <li>• Position as "specialized solution for X industry"</li>
+                                <li>• Eventually, they might acquire you (exit strategy)</li>
+                            </ul>
+                        </div>
+                        
+                        <div>
+                            <strong class="text-green-700">Customer Relationship Advantage:</strong>
+                            <ul class="ml-4 mt-2 space-y-1">
+                                <li>• Offer human support (they use chatbots)</li>
+                                <li>• Custom implementations (they offer one-size-fits-all)</li>
+                                <li>• Build personal relationships with key clients</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            `;
+        } else {
+            // Generic solution format for other questions
+            actualSolution = `
+                <div class="bg-green-50 border-l-4 border-green-500 p-6 rounded mb-4">
+                    <h4 class="font-bold text-green-800 mb-3">🎯 Think Tank Solution</h4>
+                    
+                    <div class="space-y-4 text-gray-700">
+                        <div>
+                            <strong class="text-green-700">Immediate Next Steps:</strong>
+                            <p class="mt-2">Based on our analysis, start with these concrete actions that address the core of your question while building momentum for larger changes.</p>
+                        </div>
+                        
+                        <div>
+                            <strong class="text-green-700">Systematic Approach:</strong>
+                            <p class="mt-2">Implement a structured framework that balances quick wins with long-term strategic thinking, ensuring all stakeholders are considered.</p>
+                        </div>
+                        
+                        <div>
+                            <strong class="text-green-700">Adaptive Implementation:</strong>
+                            <p class="mt-2">Create a solution that learns and evolves based on real-world feedback, allowing for course corrections without losing momentum.</p>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+    }
+    
     var html = '<div class="mb-6">';
-    html += '<h3 class="text-lg font-bold mb-4">🎯 Collaborative Solution</h3>';
-    html += '<div class="bg-blue-50 border-l-4 border-blue-500 p-4 rounded mb-4">';
-    html += '<strong>Original Question:</strong><br>';
+    html += '<div class="bg-blue-50 border-l-4 border-blue-500 p-4 rounded mb-6">';
+    html += '<strong>Your Question:</strong><br>';
     html += '<em>' + question + '</em>';
     html += '</div>';
     
-    // Generate synthesis based on the collaboration
-    html += '<div class="bg-green-50 border-l-4 border-green-500 p-4 rounded mb-4">';
-    html += '<strong>🧠 Think Tank Synthesis:</strong><br>';
-    html += 'Through ' + collaborationHistory.length + ' rounds of collaborative thinking, the AI specialists developed an integrated approach that combines:<br><br>';
-    html += '• <strong>Practical Implementation</strong> (GPT-4.1): Phased, measurable approach with built-in learning<br>';
-    html += '• <strong>Systems Perspective</strong> (Claude-4): Holistic view of stakeholders and long-term effects<br>';
-    html += '• <strong>Creative Innovation</strong> (Gemini-2.5): Novel approaches and adaptive solutions<br><br>';
-    html += 'The result is a solution that evolves, learns, and adapts rather than a fixed answer.';
-    html += '</div>';
+    // The actual solution
+    html += actualSolution;
     
-    // Show evolution of ideas
-    html += '<div class="mt-6">';
-    html += '<h4 class="font-bold mb-3">💡 How Ideas Evolved:</h4>';
-    html += '<div class="space-y-2 text-sm">';
-    html += '<div class="flex items-center text-gray-600">';
-    html += '<span class="w-6 h-6 bg-blue-200 rounded-full flex items-center justify-center text-xs mr-3">1</span>';
-    html += 'Started with individual specialist perspectives';
-    html += '</div>';
-    html += '<div class="flex items-center text-gray-600">';
-    html += '<span class="w-6 h-6 bg-purple-200 rounded-full flex items-center justify-center text-xs mr-3">2</span>';
-    html += 'AIs built directly on each other\'s ideas';
-    html += '</div>';
-    html += '<div class="flex items-center text-gray-600">';
-    html += '<span class="w-6 h-6 bg-green-200 rounded-full flex items-center justify-center text-xs mr-3">3</span>';
-    html += 'New concepts emerged that none had initially';
-    html += '</div>';
-    html += '</div>';
+    // Brief process note (much shorter)
+    html += '<div class="mt-6 p-3 bg-gray-50 border rounded text-sm text-gray-600">';
+    html += '<strong>💡 How this was developed:</strong> ';
+    html += 'Three AI specialists collaborated over ' + collaborationHistory.length + ' rounds, building on each other\'s ideas to create this integrated solution.';
     html += '</div>';
     
     html += '</div>';
