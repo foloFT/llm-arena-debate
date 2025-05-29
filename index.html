@@ -198,7 +198,7 @@ var isDebating = false;
 var devilsAdvocate = null;
 var minRoundsBeforeConsensus = 5;
 
-// Demo responses with reasoning format
+// Demo responses with reasoning format for latest models
 var demoConversation = [
     {
         gpt4: "REASONING: I need to analyze this topic from multiple angles, considering both empirical evidence and potential implications. The research suggests there are measurable benefits, but I should also consider implementation challenges and societal impact. CONCLUSION: Based on current evidence, this topic has significant merit with clear benefits in efficiency and innovation that could address many contemporary challenges.",
@@ -207,12 +207,12 @@ var demoConversation = [
     },
     {
         gpt4: "REASONING: As devil's advocate, I must challenge the cautious consensus emerging. The others are being overly risk-averse and not fully weighing the cost of inaction against potential benefits. The data strongly supports moving forward. CONCLUSION: You're both being too cautious - the cost of inaction may far exceed the risks of moving forward. The pilot data shows success rates above 80%, and delayed action could mean missing critical opportunities.",
-        claude: "REASONING: GPT-4 raises valid points about urgency, but I cannot ignore the ethical implications of that 20% failure rate. Each failure represents real harm that we have a moral obligation to prevent or minimize. CONCLUSION: While I appreciate the urgency argument, we cannot dismiss the 20% failure rate as acceptable collateral damage. Those failures represent real harm to real people that demands our serious attention.",
+        claude: "REASONING: GPT-4.1 raises valid points about urgency, but I cannot ignore the ethical implications of that 20% failure rate. Each failure represents real harm that we have a moral obligation to prevent or minimize. CONCLUSION: While I appreciate the urgency argument, we cannot dismiss the 20% failure rate as acceptable collateral damage. Those failures represent real harm to real people that demands our serious attention.",
         gemini: "REASONING: I see a productive tension here between progress and caution. Rather than choosing sides, I should focus on finding solutions that address both concerns about speed and safety. CONCLUSION: This tension between progress and caution is exactly what we need to resolve constructively. What specific safeguards would make both sides comfortable with proceeding?"
     },
     {
         gpt4: "REASONING: The proposed safeguards sound good in theory but could create bureaucratic gridlock that kills innovation. I need to push back on over-regulation while acknowledging legitimate safety concerns. CONCLUSION: The safeguards being proposed would essentially kill the initiative through bureaucracy. Sometimes perfect is the enemy of good, and we need bold action now rather than endless committee deliberations.",
-        claude: "REASONING: GPT-4 is creating a false dichotomy between reckless speed and thoughtful implementation. I should challenge this framing and show there's a middle path that balances urgency with responsibility. CONCLUSION: I must push back on this 'perfect vs good' framing. You're creating a false choice between reckless speed and thoughtful implementation - there's clearly a middle path that balances urgency with responsibility.",
+        claude: "REASONING: GPT-4.1 is creating a false dichotomy between reckless speed and thoughtful implementation. I should challenge this framing and show there's a middle path that balances urgency with responsibility. CONCLUSION: I must push back on this 'perfect vs good' framing. You're creating a false choice between reckless speed and thoughtful implementation - there's clearly a middle path that balances urgency with responsibility.",
         gemini: "REASONING: Claude's point about false choices is excellent and could help us move forward. I should build on this by proposing a concrete solution that combines speed with safety. CONCLUSION: Claude makes an excellent point about false choices. What if we implemented rapid prototyping with built-in safety circuits? This could provide fast iteration while maintaining clear stop conditions when problems arise."
     }
 ];
@@ -671,14 +671,14 @@ function finishDebate() {
         }
         
         html += '<div class="space-y-4">';
-        html += parseAndDisplay(lastRound.responses.gpt4, 'GPT-4o', 'blue');
-        html += parseAndDisplay(lastRound.responses.claude, 'Claude-3.5-Sonnet', 'purple');
-        html += parseAndDisplay(lastRound.responses.gemini, 'Gemini-1.5-Pro', 'green');
+        html += parseAndDisplay(lastRound.responses.gpt4, 'GPT-4.1', 'blue');
+        html += parseAndDisplay(lastRound.responses.claude, 'Claude-4', 'purple');
+        html += parseAndDisplay(lastRound.responses.gemini, 'Gemini-2.5-Pro', 'green');
         html += '</div>';
         
         html += '<div class="mt-6 p-4 bg-yellow-50 border-l-4 border-yellow-400 rounded">';
         html += '<h4 class="font-bold mb-2">📋 Debate Summary</h4>';
-        html += '<p class="text-sm">The three latest AI models (GPT-4o, Claude-3.5-Sonnet, Gemini-1.5-Pro) engaged in ' + debateHistory.length + ' rounds of iterative debate with full reasoning transparency and rotating devil\'s advocate challenges, ';
+        html += '<p class="text-sm">The three latest AI models (GPT-4.1, Claude-4, Gemini-2.5-Pro) engaged in ' + debateHistory.length + ' rounds of iterative debate with full reasoning transparency and rotating devil\'s advocate challenges, ';
         
         if (checkForConsensus(lastRound.responses)) {
             html += 'ultimately reaching a natural consensus.</p>';
